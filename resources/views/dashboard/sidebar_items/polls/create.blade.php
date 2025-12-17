@@ -64,11 +64,31 @@
         border-radius: 8px;
     }
     .category-item, .nominee-item, .voter-item {
-        border: 1px solid #ddd;
+        border: 1px solid #e6e6e6;
         border-radius: 8px;
-        padding: 15px;
+        padding: 12px;
         margin-bottom: 15px;
-        background: #f9f9f9;
+        background: #ffffff;
+        box-shadow: 0 2px 6px rgba(16,24,40,0.04);
+        transition: transform 0.12s ease, box-shadow 0.12s ease;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        overflow: hidden;
+    }
+    #categoriesList, #nomineesList, #eligibleVotersList {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        align-items: flex-start;
+    }
+    .category-item, .nominee-item, .voter-item {
+        flex: 0 0 320px;
+        width: 320px;
+    }
+    .category-item:hover, .nominee-item:hover, .voter-item:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 18px rgba(16,24,40,0.08);
     }
     .registration-link-box {
         background: #f8f9fa;
@@ -504,6 +524,10 @@
 <script>
 let currentPoll = null;
 let currentStep = 1;
+let editingCategoryId = null;
+let editingNomineeId = null;
+let nomineesCache = [];
+let categoriesCache = [];
 
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
@@ -531,13 +555,23 @@ function loadPollData() {
     // Load step 1 data
     document.getElementById('name').value = currentPoll.name || '';
     document.getElementById('description').value = currentPoll.description || '';
+    function toDatetimeLocalStringFromUTC(isoString) {
+        // Converts a UTC ISO string to a local datetime-local string (YYYY-MM-DDTHH:MM)
+        if (!isoString) return '';
+        const date = new Date(isoString); // parses as UTC
+        const pad = n => n.toString().padStart(2, '0');
+        const year = date.getFullYear();
+        const month = pad(date.getMonth() + 1);
+        const day = pad(date.getDate());
+        const hours = pad(date.getHours());
+        const minutes = pad(date.getMinutes());
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
     if (currentPoll.start_at) {
-        const startDate = new Date(currentPoll.start_at);
-        document.getElementById('start_at').value = startDate.toISOString().slice(0, 16);
+        document.getElementById('start_at').value = toDatetimeLocalStringFromUTC(currentPoll.start_at);
     }
     if (currentPoll.end_at) {
-        const endDate = new Date(currentPoll.end_at);
-        document.getElementById('end_at').value = endDate.toISOString().slice(0, 16);
+        document.getElementById('end_at').value = toDatetimeLocalStringFromUTC(currentPoll.end_at);
     }
     
     // Load step 3 data
@@ -635,6 +669,18 @@ function saveStep1() {
     const form = document.getElementById('step1Form');
     const formData = new FormData(form);
     
+    // Convert local datetime-local values to UTC ISO-8601 before sending
+    const startAtLocal = document.getElementById('start_at').value;
+    const endAtLocal = document.getElementById('end_at').value;
+    if (startAtLocal) {
+        const startDate = new Date(startAtLocal);      // JS interprets local time
+        formData.set('start_at', startDate.toISOString()); // convert to UTC ISO string
+    }
+    if (endAtLocal) {
+        const endDate = new Date(endAtLocal);
+        formData.set('end_at', endDate.toISOString());
+    }
+    
     // Remove empty file inputs to avoid validation issues
     const coverImage = document.getElementById('cover_image');
     const bannerImage = document.getElementById('banner_image');
@@ -672,7 +718,8 @@ function saveStep1() {
     const url = currentPoll 
         ? `/polls/${currentPoll.uuid}/step1`
         : '/polls';
-    const method = currentPoll ? 'PUT' : 'POST';
+    // Use POST with _method=PUT when sending FormData to ensure PHP parses multipart data
+    const method = currentPoll ? 'POST' : 'POST';
     
     // Show loading state
     const saveBtn = document.getElementById('saveStep1Btn');
@@ -691,6 +738,10 @@ function saveStep1() {
         hasVideo: video && video.files.length > 0,
     });
     
+    if (currentPoll) {
+        formData.append('_method', 'PUT');
+    }
+
     fetch(url, {
         method: method,
         headers: {
@@ -761,11 +812,11 @@ function loadStep2Data() {
     .then(data => {
         console.log('Step 2 data loaded:', data); // Debug
         if (data.success) {
-            renderCategories(data.poll.categories || []);
-            // Get all nominees from poll, not just from categories
-            const allNominees = data.poll.nominees || [];
-            console.log('All nominees:', allNominees); // Debug
-            renderNominees(allNominees);
+            categoriesCache = data.poll.categories || [];
+            nomineesCache = data.poll.nominees || [];
+            renderCategories(categoriesCache);
+            console.log('All nominees:', nomineesCache); // Debug
+            renderNominees(nomineesCache);
             populateCategorySelects();
         }
     })
@@ -783,9 +834,16 @@ function renderCategories(categories) {
     
     container.innerHTML = categories.map(cat => `
         <div class="category-item" data-id="${cat.id}">
-            <h6>${cat.name}</h6>
-            <p class="text-muted small">${cat.description || 'No description'}</p>
-            <button class="btn btn-sm btn-danger" onclick="deleteCategory(${cat.id})">Delete</button>
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h6 class="mb-1">${cat.name}</h6>
+                    <p class="text-muted small mb-0">${cat.description || 'No description'}</p>
+                </div>
+                <div class="btn-group btn-group-sm" role="group" aria-label="category-actions">
+                    <button class="btn btn-outline-primary" onclick="editCategory(${cat.id})">Edit</button>
+                    <button class="btn btn-outline-danger" onclick="deleteCategory(${cat.id})">Delete</button>
+                </div>
+            </div>
         </div>
     `).join('');
 }
@@ -820,7 +878,10 @@ function renderNominees(nominees) {
                 </div>
                 <div>
                     ${nom.status !== 'approved' ? `<button class="btn btn-sm btn-primary" onclick="approveNominee(${nom.id})">Approve</button>` : ''}
-                    <button class="btn btn-sm btn-danger" onclick="deleteNominee(${nom.id})">Delete</button>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button class="btn btn-outline-secondary" onclick="editNominee(${nom.id})">Edit</button>
+                        <button class="btn btn-outline-danger" onclick="deleteNominee(${nom.id})">Delete</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -835,6 +896,9 @@ function showAddCategoryForm() {
 function cancelCategoryForm() {
     document.getElementById('addCategoryForm').style.display = 'none';
     document.getElementById('categoryForm').reset();
+    editingCategoryId = null;
+    const addBtn = document.querySelector('#addCategoryForm button.btn-primary');
+    if (addBtn) addBtn.textContent = 'Add Category';
 }
 
 function saveCategory() {
@@ -845,7 +909,33 @@ function saveCategory() {
     }
     
     const description = document.getElementById('category_description').value.trim();
-    
+
+    if (editingCategoryId) {
+        fetch(`/polls/categories/${editingCategoryId}`, {
+            method: 'PUT',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ name, description })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                loadStep2Data();
+                cancelCategoryForm();
+                showNotification('Category updated!', 'success');
+            } else {
+                showNotification(data.message || 'Error updating category', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Error updating category', 'error');
+        });
+        return;
+    }
+
     fetch(`/polls/${currentPoll.uuid}/categories`, {
         method: 'POST',
         headers: {
@@ -870,6 +960,17 @@ function saveCategory() {
     });
 }
 
+function editCategory(id) {
+    const cat = categoriesCache.find(c => c.id === id);
+    if (!cat) return;
+    editingCategoryId = id;
+    document.getElementById('category_name').value = cat.name || '';
+    document.getElementById('category_description').value = cat.description || '';
+    document.getElementById('addCategoryForm').style.display = 'block';
+    const addBtn = document.querySelector('#addCategoryForm button.btn-primary');
+    if (addBtn) addBtn.textContent = 'Save Changes';
+}
+
 function deleteCategory(id) {
     if (!confirm('Delete this category?')) return;
     
@@ -889,18 +990,20 @@ function deleteCategory(id) {
 }
 
 function populateCategorySelects() {
-    fetch(`/polls/${currentPoll.uuid}/step2`, {
-        method: 'PUT',
+    // Use the step2-data GET endpoint to retrieve categories (avoids PUT multipart issues)
+    fetch(`/polls/${currentPoll.uuid}/step2-data`, {
+        method: 'GET',
         headers: {
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
         }
     })
     .then(response => response.json())
     .then(data => {
-        const categories = data.poll.categories || [];
+        const categories = (data.poll && data.poll.categories) ? data.poll.categories : [];
         const selects = ['nominee_category_id', 'csv_category_id'];
         selects.forEach(selectId => {
             const select = document.getElementById(selectId);
+            if (!select) return;
             select.innerHTML = '<option value="">Select Category</option>' + 
                 categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
         });
@@ -922,6 +1025,9 @@ function showCSVImport() {
 function cancelNomineeForm() {
     document.getElementById('manualNomineeForm').style.display = 'none';
     document.getElementById('nomineeForm').reset();
+    editingNomineeId = null;
+    const saveBtn = document.querySelector('#manualNomineeForm button.btn-primary');
+    if (saveBtn) saveBtn.textContent = 'Add Nominee';
 }
 
 function cancelCSVForm() {
@@ -941,6 +1047,34 @@ function saveNominee() {
     const photo = document.getElementById('nominee_photo').files[0];
     if (photo) formData.append('photo', photo);
     
+    if (editingNomineeId) {
+        // Update nominee: send POST with _method=PUT so multipart is parsed
+        formData.append('_method', 'PUT');
+        fetch(`/polls/nominees/${editingNomineeId}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                loadStep2Data();
+                cancelNomineeForm();
+                showNotification('Nominee updated!', 'success');
+            } else {
+                showNotification(data.message || 'Error updating nominee', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Error updating nominee', 'error');
+        });
+        return;
+    }
+
+    // Create new nominee
     fetch(`/polls/${currentPoll.uuid}/nominees`, {
         method: 'POST',
         headers: {
@@ -955,7 +1089,28 @@ function saveNominee() {
             cancelNomineeForm();
             showNotification('Nominee added!', 'success');
         }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error adding nominee', 'error');
     });
+}
+
+function editNominee(id) {
+    const nom = nomineesCache.find(n => n.id === id);
+    if (!nom) return;
+    editingNomineeId = id;
+    // populate form
+    document.getElementById('nominee_category_id').value = nom.category_id || '';
+    document.getElementById('nominee_name').value = nom.name || '';
+    document.getElementById('nominee_email').value = nom.email || '';
+    document.getElementById('nominee_phone').value = nom.phone || '';
+    document.getElementById('nominee_social_link').value = nom.social_link || '';
+    document.getElementById('nominee_bio').value = nom.bio || '';
+    document.getElementById('manualNomineeForm').style.display = 'block';
+    const saveBtn = document.querySelector('#manualNomineeForm button.btn-primary');
+    if (saveBtn) saveBtn.textContent = 'Save Changes';
+    populateCategorySelects();
 }
 
 function importNomineesCSV() {
@@ -1109,17 +1264,16 @@ function saveStep3() {
         console.log(pair[0] + ': ' + pair[1]);
     }
     
+    // Use POST with _method=PUT so PHP properly parses FormData (including multipart)
+    formData.append('_method', 'PUT');
     fetch(`/polls/${currentPoll.uuid}/step3`, {
-        method: 'PUT',
+        method: 'POST',
         headers: {
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
         },
         body: formData
     })
-    .then(response => {
-        console.log('Response status:', response.status);
-        return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
         console.log('Response data:', data);
         if (data.success) {

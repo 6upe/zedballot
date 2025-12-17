@@ -37,6 +37,8 @@ class Poll extends Model
         'allow_vote_edit' => 'boolean',
     ];
 
+    protected $appends = ['computed_status'];
+
     public function getRouteKeyName(): string
     {
         return 'uuid';
@@ -82,8 +84,50 @@ class Poll extends Model
      ======================= */
     public function isActive(): bool
     {
-        return $this->status === 'active'
-            && now()->between($this->start_at, $this->end_at);
+        if ($this->status !== 'active') {
+            return false;
+        }
+
+        // Use timestamps to avoid timezone issues
+        $now = now()->getTimestamp();
+        $startTime = $this->start_at?->getTimestamp();
+        $endTime = $this->end_at?->getTimestamp();
+
+        if (!$startTime || !$endTime) {
+            return false;
+        }
+
+        return $now >= $startTime && $now <= $endTime;
+    }
+
+    public function isClosed(): bool
+    {
+        if (!$this->end_at) {
+            return false;
+        }
+        return now()->getTimestamp() > $this->end_at->getTimestamp();
+    }
+
+    /**
+     * Computed status that reflects actual poll state
+     * Returns: 'draft', 'active', or 'closed'
+     */
+    public function getComputedStatusAttribute(): string
+    {
+        if ($this->status === 'draft') {
+            return 'draft';
+        }
+        
+        if ($this->isClosed()) {
+            return 'closed';
+        }
+        
+        if ($this->isActive()) {
+            return 'active';
+        }
+        
+        // Poll hasn't started yet
+        return 'scheduled';
     }
 
     public function getVotingMethods(): array

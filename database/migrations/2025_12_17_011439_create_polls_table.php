@@ -18,7 +18,7 @@ return new class extends Migration
             $table->timestamp('start_at')->nullable();
             $table->timestamp('end_at')->nullable();
 
-            $table->enum('status', ['draft', 'active', 'closed'])->default('draft');
+            $table->enum('status', ['draft', 'active', 'closed', 'scheduled'])->default('draft');
 
             // Media
             $table->string('cover_image')->nullable();

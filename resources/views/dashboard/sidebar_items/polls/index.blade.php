@@ -36,10 +36,11 @@
     @else
       <div class="row">
         @foreach($polls as $poll)
-          @php
-            $statusClass = match($poll->status) {
+            @php
+            $statusClass = match($poll->computed_status) {
               'active' => 'badge-success',
               'closed' => 'badge-danger',
+              'scheduled' => 'badge-info',
               default => 'badge-secondary',
             };
             $coverUrl = $poll->cover_image
@@ -51,7 +52,7 @@
               <div class="card-img-top poll-card-cover"
                    style="background-image: url('{{ $coverUrl }}');">
                 <span class="badge {{ $statusClass }} poll-status-badge text-uppercase">
-                  {{ $poll->status }}
+                  {{ $poll->computed_status }}
                 </span>
               </div>
               <div class="card-body d-flex flex-column">
@@ -63,20 +64,25 @@
                 <div class="mb-2 small text-muted">
                   <div>
                     <i class="far fa-calendar mr-1"></i>
-                    {{ $poll->start_at->format('M d, Y H:i') }}
+                    {{ $poll->start_at->setTimezone('Africa/Lusaka')->format('M d, Y H:i') }}
                     &mdash;
-                    {{ $poll->end_at->format('M d, Y H:i') }}
+                    {{ $poll->end_at->setTimezone('Africa/Lusaka')->format('M d, Y H:i') }}
                   </div>
                 </div>
 
                 <div class="mb-3">
-                  @if($poll->status === 'draft')
+                  @if($poll->computed_status === 'draft')
                     <span class="text-warning small font-weight-semibold">Not yet published</span>
+                  @elseif($poll->computed_status === 'scheduled')
+                    <span class="text-info small font-weight-semibold">Scheduled to start</span>
+                  @elseif($poll->computed_status === 'closed')
+                    <span class="text-danger small font-weight-semibold">Poll Closed</span>
                   @else
                     <span class="small text-muted d-block">Time remaining</span>
                     <div class="font-weight-bold" data-countdown
-                         data-status="{{ $poll->status }}"
-                         data-end="{{ $poll->end_at->toIso8601String() }}">
+                         data-status="{{ $poll->computed_status }}"
+                         data-end="{{ $poll->end_at->toIso8601String() }}"
+                         data-server-now="{{ now()->toIso8601String() }}">
                       --:--:--:--
                     </div>
                   @endif
@@ -116,7 +122,7 @@
                     <button type="button"
                             class="btn btn-sm btn-outline-secondary mb-2 poll-share-btn"
                             data-share-url="{{ route('polls.vote', $poll) }}"
-                            @if($poll->status !== 'active') disabled @endif
+                            @if($poll->computed_status !== 'active') disabled @endif
                             title="Copy voting link">
                       <i class="fas fa-share-alt mr-1"></i> Vote link
                     </button>
@@ -165,11 +171,24 @@
     function updateCountdown(el) {
       var status = el.getAttribute('data-status');
       var end = el.getAttribute('data-end');
-      if (!end) return;
+      var serverNow = el.getAttribute('data-server-now');
+      
+      if (!end || !serverNow) return;
 
+      // Parse server time and end time
+      var serverTime = new Date(serverNow);
       var endTime = new Date(end);
-      var now = new Date();
-      var diff = endTime - now;
+      
+      // Calculate difference from SERVER time to end time (not browser time)
+      // On first load, use server time. Then increment by elapsed wall-clock time.
+      if (!el._serverStartMs) {
+        el._serverStartMs = serverTime.getTime();
+        el._wallClockStartMs = Date.now();
+      }
+      
+      var elapsedMs = Date.now() - el._wallClockStartMs;
+      var currentServerTimeMs = el._serverStartMs + elapsedMs;
+      var diff = endTime.getTime() - currentServerTimeMs;
 
       if (status === 'draft') {
         el.textContent = 'Not yet published';

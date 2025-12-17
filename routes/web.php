@@ -73,6 +73,13 @@ Route::prefix('polls')->middleware(['auth'])->group(function () {
     Route::get('/create', [PollController::class, 'create'])->name('polls.create');
     Route::post('/', [PollController::class, 'store'])->name('polls.store');
 
+    // API: Fetch current server time (for frontend countdowns)
+    Route::get('/api/server-time', function () {
+        return response()->json([
+            'server_time' => now()->toIso8601String(),
+        ]);
+    })->withoutMiddleware('auth')->name('api.server-time');
+
     // Progressive update endpoints for multi-step creation
     Route::put('{poll}/step1', [PollController::class, 'updateStep1'])->name('polls.update.step1');
     Route::put('{poll}/step2', [PollController::class, 'updateStep2'])->name('polls.update.step2');
@@ -114,6 +121,26 @@ Route::prefix('polls')->middleware(['auth'])->group(function () {
 
     // Results
     Route::get('{poll}/results', [PollController::class, 'results'])->name('polls.results');
+
+    // Debug: Check poll status
+    Route::get('{poll}/debug', function (Poll $poll) {
+        $now = now();
+        return response()->json([
+            'poll_id' => $poll->id,
+            'poll_status' => $poll->status,
+            'start_at' => $poll->start_at?->toIso8601String(),
+            'end_at' => $poll->end_at?->toIso8601String(),
+            'current_time' => $now->toIso8601String(),
+            'is_active' => $poll->isActive(),
+            'is_closed' => $poll->isClosed(),
+            'computed_status' => $poll->computed_status,
+            'timestamps' => [
+                'now' => $now->getTimestamp(),
+                'start' => $poll->start_at?->getTimestamp(),
+                'end' => $poll->end_at?->getTimestamp(),
+            ]
+        ]);
+    })->name('polls.debug');
 });
 
 // Public self-registration routes (no auth required)
@@ -138,6 +165,14 @@ Route::prefix('voters')->group(function () {
     })->name('voters.register');
     
     Route::post('register', [PollController::class, 'submitVoterRegistration'])->name('voters.register.submit');
+});
+
+Route::get('/debug-time', function () {
+    return [
+        'laravel_now' => now()->toDateTimeString(),
+        'php_timezone' => date_default_timezone_get(),
+        'laravel_timezone' => config('app.timezone'),
+    ];
 });
 
 

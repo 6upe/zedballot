@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class PollController extends Controller
 {
@@ -87,11 +88,35 @@ class PollController extends Controller
                 }
             }
 
+            // Parse datetimes: if ISO-8601 format (from client conversion), parse as UTC.
+            // Otherwise parse in server timezone (for manual API calls).
+            $startAt = null;
+            if (isset($data['start_at']) && $data['start_at'] !== null) {
+                try {
+                    // Try parsing as ISO-8601 UTC first (from client conversion)
+                    $startAt = Carbon::parse($data['start_at'], 'UTC');
+                } catch (\Exception $e) {
+                    // Fall back to server timezone parsing
+                    $startAt = Carbon::parse($data['start_at'], config('app.timezone'));
+                }
+            }
+            
+            $endAt = null;
+            if (isset($data['end_at']) && $data['end_at'] !== null) {
+                try {
+                    // Try parsing as ISO-8601 UTC first (from client conversion)
+                    $endAt = Carbon::parse($data['end_at'], 'UTC');
+                } catch (\Exception $e) {
+                    // Fall back to server timezone parsing
+                    $endAt = Carbon::parse($data['end_at'], config('app.timezone'));
+                }
+            }
+
             $poll = Poll::create([
                 'name' => $data['name'],
                 'description' => $data['description'] ?? null,
-                'start_at' => $data['start_at'] ?? null,
-                'end_at' => $data['end_at'] ?? null,
+                'start_at' => $startAt,
+                'end_at' => $endAt,
                 'status' => 'draft',
                 'cover_image' => $coverPath,
                 'banner_image' => $bannerPath,
@@ -207,8 +232,28 @@ class PollController extends Controller
 
             $poll->name = $data['name'];
             $poll->description = $data['description'] ?? null;
-            $poll->start_at = $data['start_at'] ?? null;
-            $poll->end_at = $data['end_at'] ?? null;
+            
+            // Parse datetimes: if ISO-8601 format (from client conversion), parse as UTC.
+            // Otherwise parse in server timezone (for manual API calls).
+            if (!empty($data['start_at'])) {
+                try {
+                    $poll->start_at = Carbon::parse($data['start_at'], 'UTC');
+                } catch (\Exception $e) {
+                    $poll->start_at = Carbon::parse($data['start_at'], config('app.timezone'));
+                }
+            } else {
+                $poll->start_at = null;
+            }
+            
+            if (!empty($data['end_at'])) {
+                try {
+                    $poll->end_at = Carbon::parse($data['end_at'], 'UTC');
+                } catch (\Exception $e) {
+                    $poll->end_at = Carbon::parse($data['end_at'], config('app.timezone'));
+                }
+            } else {
+                $poll->end_at = null;
+            }
             $poll->save();
 
             return response()->json([
@@ -451,6 +496,14 @@ class PollController extends Controller
     {
         $poll->load(['categories.nominees', 'eligibleVoters']);
 
+        // Ensure start_at and end_at are ISO 8601 strings for correct JS parsing
+        if ($poll->start_at) {
+            $poll->start_at = $poll->start_at->toIso8601String();
+        }
+        if ($poll->end_at) {
+            $poll->end_at = $poll->end_at->toIso8601String();
+        }
+
         // For draft polls, allow editing. For active/closed, show read-only view
         if ($poll->status === 'draft') {
             return view('dashboard.sidebar_items.polls.create', compact('poll'));
@@ -472,6 +525,14 @@ class PollController extends Controller
     public function edit(Poll $poll)
     {
         $poll->load(['categories.nominees', 'eligibleVoters']);
+
+        // Ensure start_at and end_at are ISO 8601 strings for correct JS parsing
+        if ($poll->start_at) {
+            $poll->start_at = $poll->start_at->toIso8601String();
+        }
+        if ($poll->end_at) {
+            $poll->end_at = $poll->end_at->toIso8601String();
+        }
 
         // Use the same create view but pass the poll for editing
         return view('dashboard.sidebar_items.polls.create', compact('poll'));
@@ -495,7 +556,6 @@ class PollController extends Controller
                 'email_domain' => ['nullable', 'string'],
                 'country' => ['nullable', 'string'],
                 'allow_vote_edit' => ['sometimes', 'boolean'],
-            'status' => ['required', 'in:draft,active,closed'],
             ]);
 
             $isPublic = $request->has('is_public') ? (bool) $request->boolean('is_public') : true;
@@ -537,9 +597,19 @@ class PollController extends Controller
 
         $poll->name = $data['name'];
         $poll->description = $data['description'] ?? null;
-        $poll->start_at = $data['start_at'];
-        $poll->end_at = $data['end_at'];
-        $poll->status = $data['status'];
+        // Parse datetimes: if ISO-8601 format (from client conversion), parse as UTC.
+        // Otherwise parse in server timezone (for manual API calls).
+        try {
+            $poll->start_at = Carbon::parse($data['start_at'], 'UTC');
+        } catch (\Exception $e) {
+            $poll->start_at = Carbon::parse($data['start_at'], config('app.timezone'));
+        }
+        try {
+            $poll->end_at = Carbon::parse($data['end_at'], 'UTC');
+        } catch (\Exception $e) {
+            $poll->end_at = Carbon::parse($data['end_at'], config('app.timezone'));
+        }
+        // NOTE: status is controlled exclusively by publish/draft actions, not update()
         $poll->is_public = $isPublic;
         $poll->email_domain = $data['email_domain'] ?? null;
         $poll->country = $data['country'] ?? null;
@@ -869,12 +939,27 @@ class PollController extends Controller
 
     public function showVote(Poll $poll)
     {
-        // To be implemented: ensure poll is active and voter is eligible
+        // Ensure poll is active
+        $poll->load(['categories.nominees']);
+
+        if ($poll->status !== 'active' || $poll->isClosed()) {
+            // If not active or has passed end time, show preview with message
+            $message = $poll->status === 'draft' 
+                ? 'This poll is not yet published.' 
+                : 'This poll has ended.';
+            return view('polls.preview', compact('poll'))->with('message', $message);
+        }
+
+        return view('polls.vote', compact('poll'));
     }
 
     public function submitVote(Request $request, Poll $poll)
     {
-        // To be implemented
+        // To be implemented: handle vote submission
+        return response()->json([
+            'success' => false,
+            'message' => 'Voting not implemented yet.'
+        ], 501);
     }
 
     public function results(Poll $poll)
