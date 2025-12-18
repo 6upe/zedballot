@@ -92,24 +92,13 @@ class PollController extends Controller
             // Otherwise parse in server timezone (for manual API calls).
             $startAt = null;
             if (isset($data['start_at']) && $data['start_at'] !== null) {
-                try {
-                    // Try parsing as ISO-8601 UTC first (from client conversion)
-                    $startAt = Carbon::parse($data['start_at'], 'UTC');
-                } catch (\Exception $e) {
-                    // Fall back to server timezone parsing
-                    $startAt = Carbon::parse($data['start_at'], config('app.timezone'));
-                }
+                // Parse as local (Africa/Lusaka), then convert to UTC for storage
+                $startAt = $data['start_at'];
             }
-            
+
             $endAt = null;
             if (isset($data['end_at']) && $data['end_at'] !== null) {
-                try {
-                    // Try parsing as ISO-8601 UTC first (from client conversion)
-                    $endAt = Carbon::parse($data['end_at'], 'UTC');
-                } catch (\Exception $e) {
-                    // Fall back to server timezone parsing
-                    $endAt = Carbon::parse($data['end_at'], config('app.timezone'));
-                }
+                $endAt = $data['end_at'];
             }
 
             $poll = Poll::create([
@@ -233,24 +222,15 @@ class PollController extends Controller
             $poll->name = $data['name'];
             $poll->description = $data['description'] ?? null;
             
-            // Parse datetimes: if ISO-8601 format (from client conversion), parse as UTC.
-            // Otherwise parse in server timezone (for manual API calls).
+            // Parse as local (Africa/Lusaka), then convert to UTC for storage
             if (!empty($data['start_at'])) {
-                try {
-                    $poll->start_at = Carbon::parse($data['start_at'], 'UTC');
-                } catch (\Exception $e) {
-                    $poll->start_at = Carbon::parse($data['start_at'], config('app.timezone'));
-                }
+                $poll->start_at = $data['start_at'];
             } else {
                 $poll->start_at = null;
             }
-            
+
             if (!empty($data['end_at'])) {
-                try {
-                    $poll->end_at = Carbon::parse($data['end_at'], 'UTC');
-                } catch (\Exception $e) {
-                    $poll->end_at = Carbon::parse($data['end_at'], config('app.timezone'));
-                }
+                $poll->end_at = $data['end_at'];
             } else {
                 $poll->end_at = null;
             }
@@ -600,14 +580,14 @@ class PollController extends Controller
         // Parse datetimes: if ISO-8601 format (from client conversion), parse as UTC.
         // Otherwise parse in server timezone (for manual API calls).
         try {
-            $poll->start_at = Carbon::parse($data['start_at'], 'UTC');
+            $poll->start_at = $data['start_at'];
         } catch (\Exception $e) {
-            $poll->start_at = Carbon::parse($data['start_at'], config('app.timezone'));
+            $poll->start_at = $data['start_at'];
         }
         try {
-            $poll->end_at = Carbon::parse($data['end_at'], 'UTC');
+            $poll->end_at = $data['end_at'];
         } catch (\Exception $e) {
-            $poll->end_at = Carbon::parse($data['end_at'], config('app.timezone'));
+            $poll->end_at = $data['end_at'];
         }
         // NOTE: status is controlled exclusively by publish/draft actions, not update()
         $poll->is_public = $isPublic;

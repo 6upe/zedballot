@@ -15,8 +15,8 @@ return new class extends Migration
             $table->string('name');
             $table->text('description')->nullable();
 
-            $table->timestamp('start_at')->nullable();
-            $table->timestamp('end_at')->nullable();
+            $table->dateTime('start_at')->nullable();
+            $table->dateTime('end_at')->nullable();
 
             $table->enum('status', ['draft', 'active', 'closed', 'scheduled'])->default('draft');
 

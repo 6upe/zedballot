@@ -669,16 +669,14 @@ function saveStep1() {
     const form = document.getElementById('step1Form');
     const formData = new FormData(form);
     
-    // Convert local datetime-local values to UTC ISO-8601 before sending
+    // Send raw datetime-local values (local time) to backend
     const startAtLocal = document.getElementById('start_at').value;
     const endAtLocal = document.getElementById('end_at').value;
     if (startAtLocal) {
-        const startDate = new Date(startAtLocal);      // JS interprets local time
-        formData.set('start_at', startDate.toISOString()); // convert to UTC ISO string
+        formData.set('start_at', startAtLocal);
     }
     if (endAtLocal) {
-        const endDate = new Date(endAtLocal);
-        formData.set('end_at', endDate.toISOString());
+        formData.set('end_at', endAtLocal);
     }
     
     // Remove empty file inputs to avoid validation issues
