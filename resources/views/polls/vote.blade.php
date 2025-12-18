@@ -156,6 +156,63 @@
             <form id="votingForm" method="POST" action="{{ route('polls.vote.submit', $poll) }}">
                 @csrf
 
+                <h4 class="mb-3">Voter Information</h4>
+                <input type="hidden" name="poll_id" value="{{ $poll->id }}">
+                @php $methods = array_map('trim', explode(',', $poll->voting_methods)); @endphp
+                <div class="form-row">
+                    @if(in_array('name', $methods) || $poll->is_public)
+                    <div class="form-group col-md-6">
+                        <label for="voter_name">Name</label>
+                        <input type="text" class="form-control" id="voter_name" name="name" required>
+                    </div>
+                    @endif
+                    @if(in_array('email', $methods))
+                    <div class="form-group col-md-6">
+                        <label for="voter_email">Email</label>
+                        <input type="email" class="form-control" id="voter_email" name="email" required>
+                    </div>
+                    @endif
+                    @if(in_array('phone', $methods))
+                    <div class="form-group col-md-6">
+                        <label for="voter_phone">Phone</label>
+                        <input type="text" class="form-control" id="voter_phone" name="phone" required>
+                    </div>
+                    @endif
+                    @if(in_array('nrc', $methods))
+                    <div class="form-group col-md-6">
+                        <label for="voter_nrc">NRC</label>
+                        <input type="text" class="form-control" id="voter_nrc" name="nrc" required>
+                    </div>
+                    @endif
+                    @if(in_array('passport', $methods))
+                    <div class="form-group col-md-6">
+                        <label for="voter_passport">Passport</label>
+                        <input type="text" class="form-control" id="voter_passport" name="passport" required>
+                    </div>
+                    @endif
+                </div>
+                @if(count($methods) === 1)
+                    <input type="hidden" name="identifier_type" value="{{ $methods[0] }}">
+                    <input type="hidden" name="identifier_value" value="{{ $methods[0] === 'email' ? old('email') : ( ($methods[0] === 'phone') ? old('phone') : ( ($methods[0] === 'nrc') ? old('nrc') : old('passport') ) ) }}">
+                @else
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="identifier_type">Identifier Type</label>
+                            <select class="form-control" id="identifier_type" name="identifier_type" required>
+                                @foreach($methods as $method)
+                                    <option value="{{ $method }}">{{ ucfirst($method) }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="identifier_value">Identifier Value</label>
+                            <input type="text" class="form-control" id="identifier_value" name="identifier_value" required>
+                        </div>
+                    </div>
+                @endif
+
+                <hr>
+
                 @foreach($poll->categories as $category)
                     <div class="category-card">
                         <h5 class="mb-3">
@@ -174,7 +231,7 @@
                                 @foreach($categoryNominees as $nominee)
                                     <label class="nominee-option" onclick="this.querySelector('input').checked = true;">
                                         <div class="d-flex align-items-start">
-                                            <input type="radio" name="category_{{ $category->id }}" value="{{ $nominee->id }}" 
+                                            <input type="radio" name="votes[{{ $category->id }}]" value="{{ $nominee->id }}" 
                                                    style="margin-top: 0.5rem;">
                                             <div class="flex-grow-1">
                                                 @if($nominee->photo)
@@ -217,7 +274,7 @@
 
                 <div class="text-center mb-4">
                     <button type="submit" class="btn btn-vote btn-lg">
-                        <i class="fas fa-check-circle mr-2"></i>Submit Your Votes
+                        <i class="fas fa-check-circle mr-2"></i>Submit Your Vote
                     </button>
                 </div>
             </form>
@@ -250,11 +307,7 @@
         });
 
         // Handle form submission
-        document.getElementById('votingForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            // For now, show a message. Full implementation will come next.
-            alert('Vote submission coming soon!');
-        });
+        // Remove JS alert and allow normal form submission
     </script>
 </body>
 </html>

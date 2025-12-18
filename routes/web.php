@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PollController;
+use App\Http\Controllers\VotingController;
 use App\Models\Poll;
 
 
@@ -115,12 +116,7 @@ Route::prefix('polls')->middleware(['auth'])->group(function () {
     Route::delete('eligible-voters/{voter}', [PollController::class, 'deleteEligibleVoter'])->name('polls.eligible-voters.destroy');
     Route::delete('nominees/{nominee}', [PollController::class, 'deleteNominee'])->name('polls.nominees.destroy');
 
-    // Voting
-    Route::get('{poll}/vote', [PollController::class, 'showVote'])->name('polls.vote');
-    Route::post('{poll}/vote', [PollController::class, 'submitVote'])->name('polls.vote.submit');
-
-    // Results
-    Route::get('{poll}/results', [PollController::class, 'results'])->name('polls.results');
+   
 
     // Debug: Check poll status
     Route::get('{poll}/debug', function (Poll $poll) {
@@ -142,6 +138,13 @@ Route::prefix('polls')->middleware(['auth'])->group(function () {
         ]);
     })->name('polls.debug');
 });
+
+ // Voting
+    Route::get('polls/{poll}/vote', [VotingController::class, 'showVote'])->name('polls.vote');
+    Route::post('polls/{poll}/vote', [VotingController::class, 'submitVote'])->name('polls.vote.submit');
+
+    // Results
+    Route::get('polls/{poll}/results', [PollController::class, 'results'])->name('polls.results');
 
 // Public self-registration routes (no auth required)
 Route::prefix('nominees')->group(function () {

@@ -20,7 +20,6 @@
         <ul class="dropdown-menu" @if(request()->routeIs('polls.*')) style="display:block;" @endif>
           <li><a class="nav-link {{ request()->routeIs('polls.index') ? 'active' : '' }}" href="{{ route('polls.index') }}">Active Polls</a></li>
           <li><a class="nav-link {{ request()->routeIs('polls.create') ? 'active' : '' }}" href="{{ route('polls.create') }}">Create Poll</a></li>
-          <li><a class="nav-link" href="#">Poll History</a></li>
         </ul>
       </li>
 

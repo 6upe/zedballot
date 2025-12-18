@@ -938,7 +938,7 @@ class PollController extends Controller
         // To be implemented: handle vote submission
         return response()->json([
             'success' => false,
-            'message' => 'Voting not implemented yet.'
+            'message' => 'Voting implemented in VotingController.',
         ], 501);
     }
 
