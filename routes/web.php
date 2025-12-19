@@ -141,7 +141,11 @@ Route::prefix('polls')->middleware(['auth'])->group(function () {
 
  // Voting
     Route::get('polls/{poll}/vote', [VotingController::class, 'showVote'])->name('polls.vote');
+
     Route::post('polls/{poll}/vote', [VotingController::class, 'submitVote'])->name('polls.vote.submit');
+    Route::get('polls/{poll}/vote/confirm/{voter}', [\App\Http\Controllers\VotingController::class, 'confirmVote'])
+        ->name('polls.vote.confirm')
+        ->middleware('signed');
 
     // Results
     Route::get('polls/{poll}/results', [PollController::class, 'results'])->name('polls.results');

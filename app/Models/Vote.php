@@ -39,4 +39,12 @@ class Vote extends Model
     {
         return $this->belongsTo(Voter::class);
     }
+
+     public function scopeVerified(
+        $query
+    ) {
+        return $query->whereHas('voter', function ($q) {
+            $q->whereNotNull('verified_at');
+        });
+    }
 }

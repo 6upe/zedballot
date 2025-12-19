@@ -1,3 +1,4 @@
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -95,6 +96,29 @@
 <body>
     <div class="poll-header">
         <div class="container">
+                    @if ($errors->any())
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    html: `{!! implode('<br>', $errors->all()) !!}`,
+                                });
+                            });
+                        </script>
+                    @endif
+
+                    @if (session('email_confirmation_sent'))
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                Swal.fire({
+                                    icon: 'info',
+                                    title: 'Email Sent',
+                                    text: 'A confirmation email has been sent. Please check your inbox to confirm your vote.',
+                                });
+                            });
+                        </script>
+                    @endif
             <div class="row align-items-center">
                 <div class="col-md-8">
                     <h1 class="mb-2">{{ $poll->name }}</h1>
