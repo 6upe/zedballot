@@ -96,6 +96,9 @@
                     <a href="{{ route('polls.show', $poll) }}" class="btn btn-sm btn-outline-info" title="View">
                       <i class="fas fa-eye"></i>
                     </a>
+                    <a href="{{ route('polls.results', $poll) }}" class="btn btn-sm btn-outline-success" title="Results">
+                      <i class="fas fa-chart-bar"></i> Results
+                    </a>
                     @if($poll->status === 'draft')
                     <a href="{{ route('polls.preview', $poll) }}" class="btn btn-sm btn-outline-warning" title="Preview" target="_blank">
                       <i class="fas fa-external-link-alt"></i>

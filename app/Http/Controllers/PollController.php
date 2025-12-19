@@ -944,7 +944,17 @@ class PollController extends Controller
 
     public function results(Poll $poll)
     {
-        // To be implemented
+        // Load poll with categories and nominees, and count votes for each nominee
+        $poll->load(['categories.nominees' => function ($query) {
+            $query->withCount(['votes as vote_count' => function ($q) {
+                $q->whereHas('voter', function ($v) {
+                    $v->whereNotNull('verified_at');
+                });
+            }]);
+        }]);
+
+        // For computed_status, is_public, etc. to be available in the view
+        return view('polls.results', compact('poll'));
     }
 
     /**
