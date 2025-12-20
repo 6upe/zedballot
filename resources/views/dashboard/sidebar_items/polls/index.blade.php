@@ -94,9 +94,9 @@
                       <i class="fas fa-edit"></i>
                     </a>
                     <a href="{{ route('polls.show', $poll) }}" class="btn btn-sm btn-outline-info" title="View">
-                      <i class="fas fa-eye"></i>
+
                     </a>
-                    <a href="{{ route('polls.results', $poll) }}" class="btn btn-sm btn-outline-success" title="Results">
+                    <a href="{{ route('polls.results', $poll) }}" class="btn btn-sm btn-outline-success poll-share-link" title="Results" target="_blank" data-share-url="{{ route('polls.results', $poll) }}">
                       <i class="fas fa-chart-bar"></i> Results
                     </a>
                     @if($poll->status === 'draft')
@@ -119,16 +119,14 @@
                             class="btn btn-sm btn-outline-info mb-1 poll-share-btn"
                             data-share-url="{{ route('polls.preview', $poll) }}"
                             title="Copy preview link">
-                      <i class="fas fa-eye mr-1"></i> Preview link
+                      Preview link
                     </button>
                     @endif
-                    <button type="button"
-                            class="btn btn-sm btn-outline-secondary mb-2 poll-share-btn"
-                            data-share-url="{{ route('polls.vote', $poll) }}"
-                            @if($poll->computed_status !== 'active') disabled @endif
-                            title="Copy voting link">
+                    <a href="{{ route('polls.vote', $poll) }}" class="btn btn-sm btn-outline-secondary mb-2 poll-share-link" target="_blank"
+                       data-share-url="{{ route('polls.vote', $poll) }}" @if($poll->computed_status !== 'active') disabled @endif
+                       title="Vote link (opens in new tab, click to copy)">
                       <i class="fas fa-share-alt mr-1"></i> Vote link
-                    </button>
+                    </a>
                   </div>
                 </div>
               </div>
@@ -169,6 +167,32 @@
 @endpush
 
 @push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  function copyToClipboard(text) {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+    } else {
+      var temp = document.createElement('input');
+      document.body.appendChild(temp);
+      temp.value = text;
+      temp.select();
+      document.execCommand('copy');
+      document.body.removeChild(temp);
+    }
+  }
+  document.querySelectorAll('.poll-share-link').forEach(function(link) {
+    link.addEventListener('click', function(e) {
+      var url = this.getAttribute('data-share-url');
+      if (url) {
+        copyToClipboard(url);
+        this.setAttribute('title', 'Link copied!');
+        setTimeout(() => this.setAttribute('title', 'Vote link (opens in new tab, click to copy)'), 2000);
+      }
+    });
+  });
+});
+</script>
 <script>
   (function () {
     function updateCountdown(el) {

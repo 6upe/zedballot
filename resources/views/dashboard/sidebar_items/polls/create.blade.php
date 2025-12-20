@@ -3,7 +3,47 @@
 @section('title', 'Create Poll')
 
 @push('styles')
+
 <style>
+/* Nominee profile card styles */
+.profile-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(16,24,40,0.08);
+    padding: 18px 12px 12px 12px;
+    margin-bottom: 12px;
+    min-width: 220px;
+    max-width: 320px;
+    position: relative;
+    transition: box-shadow 0.15s, transform 0.15s;
+}
+.profile-card:hover {
+    box-shadow: 0 6px 18px rgba(16,24,40,0.16);
+    transform: translateY(-2px) scale(1.02);
+}
+.profile-img-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 8px;
+}
+.profile-card img {
+    border-radius: 50%;
+    border: 2px solid #e0e0e0;
+    background: #f8f9fa;
+}
+.profile-info {
+    width: 100%;
+}
+.profile-controls {
+    width: 100%;
+    gap: 8px;
+}
+
     .step-card {
         display: none;
         transition: all 0.3s ease;
@@ -81,10 +121,40 @@
         flex-wrap: wrap;
         gap: 16px;
         align-items: flex-start;
+        width: 100%;
+        box-sizing: border-box;
     }
     .category-item, .nominee-item, .voter-item {
-        flex: 0 0 320px;
-        width: 320px;
+        flex: 1 1 320px;
+        width: 100%;
+        max-width: 320px;
+        min-width: 220px;
+        box-sizing: border-box;
+        height: auto;
+    }
+    @media (max-width: 768px) {
+        #categoriesList, #nomineesList, #eligibleVotersList {
+            flex-direction: column;
+            gap: 12px;
+        }
+        .category-item, .nominee-item, .voter-item, .profile-card {
+            max-width: 100%;
+            min-width: 0;
+            width: 100%;
+            height: auto;
+        }
+        .category-item {
+            max-height: 110px;
+            overflow-y: auto;
+        }
+        .profile-controls, .btn-group {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .profile-controls button, .btn-group button {
+            margin-bottom: 6px;
+            width: 100%;
+        }
     }
     .category-item:hover, .nominee-item:hover, .voter-item:hover {
         transform: translateY(-4px);
@@ -234,9 +304,9 @@
                                     <button type="button" class="btn btn-sm btn-outline-primary" onclick="showCSVImport()">
                                         <i class="fas fa-file-csv mr-1"></i> Import CSV
                                     </button>
-                                    <a href="{{ route('polls.nominees.csv-template') }}" class="btn btn-sm btn-outline-info" download>
+                                    <button type="button" class="btn btn-sm btn-outline-info" onclick="window.location.href='{{ route('polls.nominees.csv-template') }}'">
                                         <i class="fas fa-download mr-1"></i> CSV Template
-                                    </a>
+                                    </button>
                                     <button type="button" class="btn btn-sm btn-outline-primary" onclick="generateNomineeLink()">
                                         <i class="fas fa-link mr-1"></i> Self-Registration Link
                                     </button>
@@ -860,31 +930,67 @@ function renderNominees(nominees) {
         return;
     }
     
-    container.innerHTML = nominees.map(nom => {
-        const categoryName = nom.category ? nom.category.name : (nom.category_id ? 'Category ID: ' + nom.category_id : 'No category');
-        return `
-        <div class="nominee-item" data-id="${nom.id}">
-            <div class="d-flex justify-content-between">
-                <div>
-                    <h6>${nom.name || 'Unnamed'}</h6>
-                    <p class="text-muted small mb-1">
-                        ${nom.email ? 'Email: ' + nom.email + '<br>' : ''}
-                        ${nom.phone ? 'Phone: ' + nom.phone + '<br>' : ''}
-                        Category: ${categoryName}
-                    </p>
-                    <span class="badge badge-${nom.status === 'approved' ? 'success' : 'warning'}">${nom.status || 'pending'}</span>
-                </div>
-                <div>
-                    ${nom.status !== 'approved' ? `<button class="btn btn-sm btn-primary" onclick="approveNominee(${nom.id})">Approve</button>` : ''}
-                    <div class="btn-group btn-group-sm" role="group">
-                        <button class="btn btn-outline-secondary" onclick="editNominee(${nom.id})">Edit</button>
-                        <button class="btn btn-outline-danger" onclick="deleteNominee(${nom.id})">Delete</button>
+    // Group nominees by category
+    const grouped = {};
+    nominees.forEach(nom => {
+        const catId = nom.category_id || 'uncategorized';
+        const catName = nom.category ? nom.category.name : (nom.category_id ? 'Category ID: ' + nom.category_id : 'No category');
+        if (!grouped[catId]) grouped[catId] = { name: catName, nominees: [] };
+        grouped[catId].nominees.push(nom);
+    });
+
+    // Render accordion
+    let html = '<div class="accordion" id="nomineeAccordion">';
+    let idx = 0;
+    for (const catId in grouped) {
+        const group = grouped[catId];
+        const collapseId = `collapseCat${catId}`;
+        html += `
+        <div class="card">
+            <div class="card-header" id="heading${catId}">
+                <h2 class="mb-0">
+                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#${collapseId}" aria-expanded="${idx === 0 ? 'true' : 'false'}" aria-controls="${collapseId}">
+                        ${group.name}
+                    </button>
+                </h2>
+            </div>
+            <div id="${collapseId}" class="collapse${idx === 0 ? ' show' : ''}" aria-labelledby="heading${catId}" data-parent="#nomineeAccordion">
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-3">
+                        ${group.nominees.map(nom => {
+                            const photoUrl = nom.photo
+                                ? (nom.photo.startsWith('http') ? nom.photo : `/storage/${nom.photo}`)
+                                : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(nom.name || 'Nominee') + '&background=007bff&color=fff&size=128';
+                            return `
+                            <div class="nominee-item profile-card mx-2" data-id="${nom.id}">
+                                <div class="profile-img-wrapper" style="display:flex;justify-content:center;align-items:center;min-height:120px;">
+                                    <img src="${photoUrl}" alt="${nom.name || 'Nominee'}" class="rounded-circle shadow-sm" style="width:96px;height:96px;object-fit:cover;">
+                                </div>
+                                <div class="profile-info mt-2 text-center">
+                                    <h6 class="mb-1">${nom.name || 'Unnamed'}</h6>
+                                    <div class="text-muted small mb-1">
+                                        ${nom.email ? `<div>Email: ${nom.email}</div>` : ''}
+                                        ${nom.phone ? `<div>Phone: ${nom.phone}</div>` : ''}
+                                    </div>
+                                    <div class="mb-1"><span class="badge badge-${nom.status === 'approved' ? 'success' : 'warning'}">${nom.status || 'pending'}</span></div>
+                                </div>
+                                <div class="profile-controls d-flex justify-content-center gap-2 mt-2">
+                                    ${nom.status !== 'approved' ? `<button class="btn btn-sm btn-primary mr-1" onclick="approveNominee(${nom.id})">Approve</button>` : ''}
+                                    <button class="btn btn-outline-secondary btn-sm mr-1" onclick="editNominee(${nom.id})">Edit</button>
+                                    <button class="btn btn-outline-danger btn-sm" onclick="deleteNominee(${nom.id})">Delete</button>
+                                </div>
+                            </div>
+                            `;
+                        }).join('')}
                     </div>
                 </div>
             </div>
         </div>
-    `;
-    }).join('');
+        `;
+        idx++;
+    }
+    html += '</div>';
+    container.innerHTML = html;
 }
 
 function showAddCategoryForm() {

@@ -3,478 +3,385 @@
 @section('title', 'Dashboard')
 
 @section('content')
-<div class="row">
-  <div class="col-lg-4 col-md-4 col-sm-12">
-    <div class="card card-statistic-2">
-      <div class="card-stats">
-        <div class="card-stats-title">Order Statistics - 
-          <div class="dropdown d-inline">
-            <a class="font-weight-600 dropdown-toggle" data-toggle="dropdown" href="#" id="orders-month">August</a>
-            <ul class="dropdown-menu dropdown-menu-sm">
-              <li class="dropdown-title">Select Month</li>
-              <li><a href="#" class="dropdown-item">January</a></li>
-              <li><a href="#" class="dropdown-item">February</a></li>
-              <li><a href="#" class="dropdown-item">March</a></li>
-              <li><a href="#" class="dropdown-item">April</a></li>
-              <li><a href="#" class="dropdown-item">May</a></li>
-              <li><a href="#" class="dropdown-item">June</a></li>
-              <li><a href="#" class="dropdown-item">July</a></li>
-              <li><a href="#" class="dropdown-item active">August</a></li>
-              <li><a href="#" class="dropdown-item">September</a></li>
-              <li><a href="#" class="dropdown-item">October</a></li>
-              <li><a href="#" class="dropdown-item">November</a></li>
-              <li><a href="#" class="dropdown-item">December</a></li>
-            </ul>
-          </div>
+<div class="row mb-4">
+    <div class="col-md-3 col-6 mb-3">
+        <div class="card card-statistic-1">
+            <div class="card-icon bg-primary"><i class="fas fa-poll"></i></div>
+            <div class="card-wrap">
+                <div class="card-header">
+                    <h4>Total Polls</h4>
+                </div>
+                <div class="card-body">{{ $totalPolls ?? 0 }}</div>
+            </div>
         </div>
-        <div class="card-stats-items">
-          <div class="card-stats-item">
-            <div class="card-stats-item-count">24</div>
-            <div class="card-stats-item-label">Pending</div>
-          </div>
-          <div class="card-stats-item">
-            <div class="card-stats-item-count">12</div>
-            <div class="card-stats-item-label">Shipping</div>
-          </div>
-          <div class="card-stats-item">
-            <div class="card-stats-item-count">23</div>
-            <div class="card-stats-item-label">Completed</div>
-          </div>
-        </div>
-      </div>
-      <div class="card-icon shadow-primary bg-primary">
-        <i class="fas fa-archive"></i>
-      </div>
-      <div class="card-wrap">
-        <div class="card-header">
-          <h4>Total Orders</h4>
-        </div>
-        <div class="card-body">
-          59
-        </div>
-      </div>
     </div>
-  </div>
-  <div class="col-lg-4 col-md-4 col-sm-12">
-    <div class="card card-statistic-2">
-      <div class="card-chart">
-        <canvas id="balance-chart" height="80"></canvas>
-      </div>
-      <div class="card-icon shadow-primary bg-primary">
-        <i class="fas fa-dollar-sign"></i>
-      </div>
-      <div class="card-wrap">
-        <div class="card-header">
-          <h4>Balance</h4>
+    <div class="col-md-3 col-6 mb-3">
+        <div class="card card-statistic-1">
+            <div class="card-icon bg-success"><i class="fas fa-vote-yea"></i></div>
+            <div class="card-wrap">
+                <div class="card-header">
+                    <h4>Total Votes</h4>
+                </div>
+                <div class="card-body">{{ $totalVotes ?? 0 }}</div>
+            </div>
         </div>
-        <div class="card-body">
-          $187,13
-        </div>
-      </div>
     </div>
-  </div>
-  <div class="col-lg-4 col-md-4 col-sm-12">
-    <div class="card card-statistic-2">
-      <div class="card-chart">
-        <canvas id="sales-chart" height="80"></canvas>
-      </div>
-      <div class="card-icon shadow-primary bg-primary">
-        <i class="fas fa-shopping-bag"></i>
-      </div>
-      <div class="card-wrap">
-        <div class="card-header">
-          <h4>Sales</h4>
+    <div class="col-md-3 col-6 mb-3">
+        <div class="card card-statistic-1">
+            <div class="card-icon bg-info"><i class="fas fa-list"></i></div>
+            <div class="card-wrap">
+                <div class="card-header">
+                    <h4>Categories</h4>
+                </div>
+                <div class="card-body">{{ $totalCategories ?? 0 }}</div>
+            </div>
         </div>
-        <div class="card-body">
-          4,732
-        </div>
-      </div>
     </div>
-  </div>
+    <div class="col-md-3 col-6 mb-3">
+        <div class="card card-statistic-1">
+            <div class="card-icon bg-warning"><i class="fas fa-users"></i></div>
+            <div class="card-wrap">
+                <div class="card-header">
+                    <h4>Nominees</h4>
+                </div>
+                <div class="card-body">{{ $totalNominees ?? 0 }}</div>
+            </div>
+        </div>
+    </div>
 </div>
+
+
+
 <div class="row">
-  <div class="col-lg-8">
-    <div class="card">
-      <div class="card-header">
-        <h4>Budget vs Sales</h4>
-      </div>
-      <div class="card-body">
-        <canvas id="myChart" height="158"></canvas>
-      </div>
+    <div class="d-flex justify-content-between align-items-center mb-3 col-12">
+        <p class="mb-0 text-muted">Manage all your polls from one place.</p>
+        <a href="{{ route('polls.create') }}" class="btn btn-primary">
+            <i class="fas fa-plus mr-1"></i> New Poll
+        </a>
     </div>
-  </div>
-  <div class="col-lg-4">
-    <div class="card gradient-bottom">
-      <div class="card-header">
-        <h4>Top 5 Products</h4>
-        <div class="card-header-action dropdown">
-          <a href="#" data-toggle="dropdown" class="btn btn-danger dropdown-toggle">Month</a>
-          <ul class="dropdown-menu dropdown-menu-sm dropdown-menu-right">
-            <li class="dropdown-title">Select Period</li>
-            <li><a href="#" class="dropdown-item">Today</a></li>
-            <li><a href="#" class="dropdown-item">Week</a></li>
-            <li><a href="#" class="dropdown-item active">Month</a></li>
-            <li><a href="#" class="dropdown-item">This Year</a></li>
-          </ul>
+    
+    <div class="col-12 row">
+
+        <div class="col-lg-8 mb-4">
+
+            <div class="section-body">
+                @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                @endif
+
+
+                @if($polls->isEmpty())
+                <div class="card">
+                    <div class="card-body text-center text-muted">
+                        <i class="fas fa-poll fa-2x mb-3"></i>
+                        <p class="mb-1">You have not created any polls yet.</p>
+                        <a href="{{ route('polls.create') }}" class="btn btn-sm btn-outline-primary mt-2">
+                            Create your first poll
+                        </a>
+                    </div>
+                </div>
+                @else
+                <div class="row">
+                    @foreach($polls as $poll)
+                    @php
+                    $statusClass = match($poll->computed_status) {
+                    'active' => 'badge-success',
+                    'closed' => 'badge-danger',
+                    'scheduled' => 'badge-info',
+                    default => 'badge-secondary',
+                    };
+                    $coverUrl = $poll->cover_image
+                    ? asset('storage/'.$poll->cover_image)
+                    : asset('assets/img/news/img01.jpg');
+                    @endphp
+                    <div class="mb-4 mx-2">
+                        <div class="card shadow-sm poll-card h-100 border-0">
+                            <div class="card-img-top poll-card-cover" style="background-image: url('{{ $coverUrl }}');">
+                                <span class="badge {{ $statusClass }} poll-status-badge text-uppercase">
+                                    {{ $poll->computed_status }}
+                                </span>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title mb-1">{{ $poll->name }}</h5>
+                                <p class="card-text text-muted small mb-2">
+                                    {{ Str::limit($poll->description, 120) ?: 'No description provided.' }}
+                                </p>
+
+                                <div class="mb-2 small text-muted">
+                                    <div>
+                                        <i class="far fa-calendar mr-1"></i>
+                                        {{ $poll->start_at->setTimezone('Africa/Lusaka')->format('M d, Y H:i') }}
+                                        &mdash;
+                                        {{ $poll->end_at->setTimezone('Africa/Lusaka')->format('M d, Y H:i') }}
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    @if($poll->computed_status === 'draft')
+                                    <span class="text-warning small font-weight-semibold">Not yet published</span>
+                                    @elseif($poll->computed_status === 'scheduled')
+                                    <span class="text-info small font-weight-semibold">Scheduled to start</span>
+                                    @elseif($poll->computed_status === 'closed')
+                                    <span class="text-danger small font-weight-semibold">Poll Closed</span>
+                                    @else
+                                    <span class="small text-muted d-block">Time remaining</span>
+                                    <div class="font-weight-bold" data-countdown
+                                        data-status="{{ $poll->computed_status }}"
+                                        data-end="{{ $poll->end_at->toIso8601String() }}"
+                                        data-server-now="{{ now()->toIso8601String() }}">
+                                        --:--:--:--
+                                    </div>
+                                    @endif
+                                </div>
+
+                                <div class="mt-auto d-flex flex-wrap justify-content-between align-items-center">
+                                    <div class="btn-group mb-2" role="group">
+                                        <a href="{{ route('polls.edit', $poll) }}"
+                                            class="btn btn-sm btn-outline-primary" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{{ route('polls.show', $poll) }}" class="btn btn-sm btn-outline-info"
+                                            title="View">
+
+                                        </a>
+                                        <a href="{{ route('polls.results', $poll) }}"
+                                            class="btn btn-sm btn-outline-success poll-share-link" title="Results" target="_blank" data-share-url="{{ route('polls.results', $poll) }}">
+                                            <i class="fas fa-chart-bar"></i> Results
+                                        </a>
+                                        @if($poll->status === 'draft')
+                                        <a href="{{ route('polls.preview', $poll) }}"
+                                            class="btn btn-sm btn-outline-warning" title="Preview" target="_blank">
+                                            <i class="fas fa-external-link-alt"></i>
+                                        </a>
+                                        @endif
+                                        <form action="{{ route('polls.destroy', $poll) }}" method="POST"
+                                            class="d-inline"
+                                            onsubmit="return confirm('Are you sure you want to delete this poll?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                    <div class="d-flex flex-column">
+                                        @if($poll->status === 'draft')
+                                        <button type="button" class="btn btn-sm btn-outline-info mb-1 poll-share-btn"
+                                            data-share-url="{{ route('polls.preview', $poll) }}"
+                                            title="Copy preview link">
+                                            Preview link
+                                        </button>
+                                        @endif
+                                        <a href="{{ route('polls.vote', $poll) }}" class="btn btn-sm btn-outline-secondary mb-2 poll-share-link" target="_blank"
+                                            data-share-url="{{ route('polls.vote', $poll) }}" @if($poll->computed_status !== 'active') disabled @endif
+                                            title="Vote link (opens in new tab, click to copy)">
+                                            <i class="fas fa-share-alt mr-1"></i> Vote link
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+                @endif
+            </div>
+
         </div>
-      </div>
-      <div class="card-body" id="top-5-scroll">
-        <ul class="list-unstyled list-unstyled-border">
-          <li class="media">
-            <img class="mr-3 rounded" width="55" src="{{ asset('assets/img/products/product-3-50.png') }}" alt="product">
-            <div class="media-body">
-              <div class="float-right"><div class="font-weight-600 text-muted text-small">86 Sales</div></div>
-              <div class="media-title">oPhone S9 Limited</div>
-              <div class="mt-1">
-                <div class="budget-price">
-                  <div class="budget-price-square bg-primary" data-width="64%"></div>
-                  <div class="budget-price-label">$68,714</div>
+        <div class="col-lg-4 mb-4">
+            <div class="card row">
+                <div class="card-header">
+                    <h4 class="mb-0">Recent Activity</h4>
                 </div>
-                <div class="budget-price">
-                  <div class="budget-price-square bg-danger" data-width="43%"></div>
-                  <div class="budget-price-label">$38,700</div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        @forelse($recentActivity ?? [] as $activity)
+                        <li class="mb-3">
+                            <div class="small text-muted">{{ $activity->created_at->diffForHumans() }}</div>
+                            <div>{{ $activity->description }}</div>
+                        </li>
+                        @empty
+                        <li class="text-muted">No recent activity.</li>
+                        @endforelse
+                    </ul>
                 </div>
-              </div>
             </div>
-          </li>
-          <li class="media">
-            <img class="mr-3 rounded" width="55" src="{{ asset('assets/img/products/product-4-50.png') }}" alt="product">
-            <div class="media-body">
-              <div class="float-right"><div class="font-weight-600 text-muted text-small">67 Sales</div></div>
-              <div class="media-title">iBook Pro 2018</div>
-              <div class="mt-1">
-                <div class="budget-price">
-                  <div class="budget-price-square bg-primary" data-width="84%"></div>
-                  <div class="budget-price-label">$107,133</div>
-                </div>
-                <div class="budget-price">
-                  <div class="budget-price-square bg-danger" data-width="60%"></div>
-                  <div class="budget-price-label">$91,455</div>
-                </div>
-              </div>
-            </div>
-          </li>
-          <li class="media">
-            <img class="mr-3 rounded" width="55" src="{{ asset('assets/img/products/product-1-50.png') }}" alt="product">
-            <div class="media-body">
-              <div class="float-right"><div class="font-weight-600 text-muted text-small">63 Sales</div></div>
-              <div class="media-title">Headphone Blitz</div>
-              <div class="mt-1">
-                <div class="budget-price">
-                  <div class="budget-price-square bg-primary" data-width="34%"></div>
-                  <div class="budget-price-label">$3,717</div>
-                </div>
-                <div class="budget-price">
-                  <div class="budget-price-square bg-danger" data-width="28%"></div>
-                  <div class="budget-price-label">$2,835</div>
-                </div>
-              </div>
-            </div>
-          </li>
-          <li class="media">
-            <img class="mr-3 rounded" width="55" src="{{ asset('assets/img/products/product-3-50.png') }}" alt="product">
-            <div class="media-body">
-              <div class="float-right"><div class="font-weight-600 text-muted text-small">28 Sales</div></div>
-              <div class="media-title">oPhone X Lite</div>
-              <div class="mt-1">
-                <div class="budget-price">
-                  <div class="budget-price-square bg-primary" data-width="45%"></div>
-                  <div class="budget-price-label">$13,972</div>
-                </div>
-                <div class="budget-price">
-                  <div class="budget-price-square bg-danger" data-width="30%"></div>
-                  <div class="budget-price-label">$9,660</div>
-                </div>
-              </div>
-            </div>
-          </li>
-          <li class="media">
-            <img class="mr-3 rounded" width="55" src="{{ asset('assets/img/products/product-5-50.png') }}" alt="product">
-            <div class="media-body">
-              <div class="float-right"><div class="font-weight-600 text-muted text-small">19 Sales</div></div>
-              <div class="media-title">Old Camera</div>
-              <div class="mt-1">
-                <div class="budget-price">
-                  <div class="budget-price-square bg-primary" data-width="35%"></div>
-                  <div class="budget-price-label">$7,391</div>
-                </div>
-                <div class="budget-price">
-                  <div class="budget-price-square bg-danger" data-width="28%"></div>
-                  <div class="budget-price-label">$5,472</div>
-                </div>
-              </div>
-            </div>
-          </li>
-        </ul>
-      </div>
-      <div class="card-footer pt-3 d-flex justify-content-center">
-        <div class="budget-price justify-content-center">
-          <div class="budget-price-square bg-primary" data-width="20"></div>
-          <div class="budget-price-label">Selling Price</div>
+
+
         </div>
-        <div class="budget-price justify-content-center">
-          <div class="budget-price-square bg-danger" data-width="20"></div>
-          <div class="budget-price-label">Budget Price</div>
-        </div>
-      </div>
     </div>
-  </div>
-</div>
-<div class="row">
-  <div class="col-md-6">
-    <div class="card">
-      <div class="card-header">
-        <h4>Best Products</h4>
-      </div>
-      <div class="card-body">
-        <div class="owl-carousel owl-theme" id="products-carousel">
-          <div>
-            <div class="product-item pb-3">
-              <div class="product-image">
-                <img alt="image" src="{{ asset('assets/img/products/product-4-50.png') }}" class="img-fluid">
-              </div>
-              <div class="product-details">
-                <div class="product-name">iBook Pro 2018</div>
-                <div class="product-review">
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star"></i>
+
+    <div class="col-12">
+       <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">Recent Polls</h4>
+                        <a href="{{ route('polls.index') }}" class="btn btn-sm btn-outline-primary">View All</a>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-striped mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Status</th>
+                                        <th>Start</th>
+                                        <th>End</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($recentPolls ?? [] as $poll)
+                                    <tr>
+                                        <td>{{ $poll->name }}</td>
+                                        <td><span
+                                                class="badge badge-{{ $poll->computed_status === 'active' ? 'success' : ($poll->computed_status === 'closed' ? 'danger' : 'secondary') }}">{{ ucfirst($poll->computed_status) }}</span>
+                                        </td>
+                                        <td>{{ $poll->start_at->setTimezone('Africa/Lusaka')->format('M d, Y H:i') }}
+                                        </td>
+                                        <td>{{ $poll->end_at->setTimezone('Africa/Lusaka')->format('M d, Y H:i') }}</td>
+                                        <td>
+                                            <a href="{{ route('polls.show', $poll) }}"
+                                                class="btn btn-sm btn-outline-info">View</a>
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">No recent polls.</td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-                <div class="text-muted text-small">67 Sales</div>
-                <div class="product-cta">
-                  <a href="#" class="btn btn-primary">Detail</a>
-                </div>
-              </div>  
-            </div>
-          </div>
-          <div>
-            <div class="product-item">
-              <div class="product-image">
-                <img alt="image" src="{{ asset('assets/img/products/product-3-50.png') }}" class="img-fluid">
-              </div>
-              <div class="product-details">
-                <div class="product-name">oPhone S9 Limited</div>
-                <div class="product-review">
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star-half"></i>
-                </div>
-                <div class="text-muted text-small">86 Sales</div>
-                <div class="product-cta">
-                  <a href="#" class="btn btn-primary">Detail</a>
-                </div>
-              </div>  
-            </div>
-          </div>
-          <div>
-            <div class="product-item">
-              <div class="product-image">
-                <img alt="image" src="{{ asset('assets/img/products/product-1-50.png') }}" class="img-fluid">
-              </div>
-              <div class="product-details">
-                <div class="product-name">Headphone Blitz</div>
-                <div class="product-review">
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star"></i>
-                  <i class="far fa-star"></i>
-                </div>
-                <div class="text-muted text-small">63 Sales</div>
-                <div class="product-cta">
-                  <a href="#" class="btn btn-primary">Detail</a>
-                </div>
-              </div>  
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
-  </div>
-  <div class="col-md-6">
-    <div class="card">
-      <div class="card-header">
-        <h4>Top Countries</h4>
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col-sm-6">
-            <div class="text-title mb-2">July</div>
-            <ul class="list-unstyled list-unstyled-border list-unstyled-noborder mb-0">
-              <li class="media">
-                <img class="img-fluid mt-1 img-shadow" src="{{ asset('assets/modules/flag-icon-css/flags/4x3/id.svg') }}" alt="image" width="40">
-                <div class="media-body ml-3">
-                  <div class="media-title">Indonesia</div>
-                  <div class="text-small text-muted">3,282 <i class="fas fa-caret-down text-danger"></i></div>
-                </div>
-              </li>
-              <li class="media">
-                <img class="img-fluid mt-1 img-shadow" src="{{ asset('assets/modules/flag-icon-css/flags/4x3/my.svg') }}" alt="image" width="40">
-                <div class="media-body ml-3">
-                  <div class="media-title">Malaysia</div>
-                  <div class="text-small text-muted">2,976 <i class="fas fa-caret-down text-danger"></i></div>
-                </div>
-              </li>
-              <li class="media">
-                <img class="img-fluid mt-1 img-shadow" src="{{ asset('assets/modules/flag-icon-css/flags/4x3/us.svg') }}" alt="image" width="40">
-                <div class="media-body ml-3">
-                  <div class="media-title">United States</div>
-                  <div class="text-small text-muted">1,576 <i class="fas fa-caret-up text-success"></i></div>
-                </div>
-              </li>
-            </ul>
-          </div>
-          <div class="col-sm-6 mt-sm-0 mt-4">
-            <div class="text-title mb-2">August</div>
-            <ul class="list-unstyled list-unstyled-border list-unstyled-noborder mb-0">
-              <li class="media">
-                <img class="img-fluid mt-1 img-shadow" src="{{ asset('assets/modules/flag-icon-css/flags/4x3/id.svg') }}" alt="image" width="40">
-                <div class="media-body ml-3">
-                  <div class="media-title">Indonesia</div>
-                  <div class="text-small text-muted">3,486 <i class="fas fa-caret-up text-success"></i></div>
-                </div>
-              </li>
-              <li class="media">
-                <img class="img-fluid mt-1 img-shadow" src="{{ asset('assets/modules/flag-icon-css/flags/4x3/ps.svg') }}" alt="image" width="40">
-                <div class="media-body ml-3">
-                  <div class="media-title">Palestine</div>
-                  <div class="text-small text-muted">3,182 <i class="fas fa-caret-up text-success"></i></div>
-                </div>
-              </li>
-              <li class="media">
-                <img class="img-fluid mt-1 img-shadow" src="{{ asset('assets/modules/flag-icon-css/flags/4x3/de.svg') }}" alt="image" width="40">
-                <div class="media-body ml-3">
-                  <div class="media-title">Germany</div>
-                  <div class="text-small text-muted">2,317 <i class="fas fa-caret-down text-danger"></i></div>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-<div class="row">
-  <div class="col-md-8">
-    <div class="card">
-      <div class="card-header">
-        <h4>Invoices</h4>
-        <div class="card-header-action">
-          <a href="#" class="btn btn-danger">View More <i class="fas fa-chevron-right"></i></a>
-        </div>
-      </div>
-      <div class="card-body p-0">
-        <div class="table-responsive table-invoice">
-          <table class="table table-striped">
-            <tr>
-              <th>Invoice ID</th>
-              <th>Customer</th>
-              <th>Status</th>
-              <th>Due Date</th>
-              <th>Action</th>
-            </tr>
-            <tr>
-              <td><a href="#">INV-87239</a></td>
-              <td class="font-weight-600">Kusnadi</td>
-              <td><div class="badge badge-warning">Unpaid</div></td>
-              <td>July 19, 2018</td>
-              <td>
-                <a href="#" class="btn btn-primary">Detail</a>
-              </td>
-            </tr>
-            <tr>
-              <td><a href="#">INV-48574</a></td>
-              <td class="font-weight-600">Hasan Basri</td>
-              <td><div class="badge badge-success">Paid</div></td>
-              <td>July 21, 2018</td>
-              <td>
-                <a href="#" class="btn btn-primary">Detail</a>
-              </td>
-            </tr>
-            <tr>
-              <td><a href="#">INV-76824</a></td>
-              <td class="font-weight-600">Muhamad Nuruzzaki</td>
-              <td><div class="badge badge-warning">Unpaid</div></td>
-              <td>July 22, 2018</td>
-              <td>
-                <a href="#" class="btn btn-primary">Detail</a>
-              </td>
-            </tr>
-            <tr>
-              <td><a href="#">INV-84990</a></td>
-              <td class="font-weight-600">Agung Ardiansyah</td>
-              <td><div class="badge badge-warning">Unpaid</div></td>
-              <td>July 22, 2018</td>
-              <td>
-                <a href="#" class="btn btn-primary">Detail</a>
-              </td>
-            </tr>
-            <tr>
-              <td><a href="#">INV-87320</a></td>
-              <td class="font-weight-600">Ardian Rahardiansyah</td>
-              <td><div class="badge badge-success">Paid</div></td>
-              <td>July 28, 2018</td>
-              <td>
-                <a href="#" class="btn btn-primary">Detail</a>
-              </td>
-            </tr>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-4">
-    <div class="card card-hero">
-      <div class="card-header">
-        <div class="card-icon">
-          <i class="far fa-question-circle"></i>
-        </div>
-        <h4>14</h4>
-        <div class="card-description">Customers need help</div>
-      </div>
-      <div class="card-body p-0">
-        <div class="tickets-list">
-          <a href="#" class="ticket-item">
-            <div class="ticket-title">
-              <h4>My order hasn't arrived yet</h4>
-            </div>
-            <div class="ticket-info">
-              <div>Laila Tazkiah</div>
-              <div class="bullet"></div>
-              <div class="text-primary">1 min ago</div>
-            </div>
-          </a>
-          <a href="#" class="ticket-item">
-            <div class="ticket-title">
-              <h4>Please cancel my order</h4>
-            </div>
-            <div class="ticket-info">
-              <div>Rizal Fakhri</div>
-              <div class="bullet"></div>
-              <div>2 hours ago</div>
-            </div>
-          </a>
-          <a href="#" class="ticket-item">
-            <div class="ticket-title">
-              <h4>Do you see my mother?</h4>
-            </div>
-            <div class="ticket-info">
-              <div>Syahdan Ubaidillah</div>
-              <div class="bullet"></div>
-              <div>6 hours ago</div>
-            </div>
-          </a>
-          <a href="features-tickets.html" class="ticket-item ticket-more">
-            View All <i class="fas fa-chevron-right"></i>
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
+
+
+
+
 </div>
 @endsection
+
+@push('styles')
+<style>
+.poll-card-cover {
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    padding-top: 56.25%;
+    /* 16:9 ratio */
+    border-top-left-radius: .25rem;
+    border-top-right-radius: .25rem;
+}
+
+.poll-status-badge {
+    position: absolute;
+    top: .75rem;
+    left: .75rem;
+    padding: .3rem .6rem;
+    font-size: .7rem;
+    letter-spacing: .05em;
+}
+
+.poll-card {
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.poll-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, .12);
+}
+</style>
+@endpush
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    function copyToClipboard(text) {
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text);
+        } else {
+            var temp = document.createElement('input');
+            document.body.appendChild(temp);
+            temp.value = text;
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+        }
+    }
+    document.querySelectorAll('.poll-share-link').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            var url = this.getAttribute('data-share-url');
+            if (url) {
+                copyToClipboard(url);
+                this.setAttribute('title', 'Link copied!');
+                setTimeout(() => this.setAttribute('title', 'Vote link (opens in new tab, click to copy)'), 2000);
+            }
+        });
+    });
+});
+</script>
+<script>
+(function () {
+  function updateCountdown(el) {
+    var status = el.getAttribute('data-status');
+    var end = el.getAttribute('data-end');
+    var serverNow = el.getAttribute('data-server-now');
+    if (!end || !serverNow) return;
+    var serverTime = new Date(serverNow);
+    var endTime = new Date(end);
+    if (!el._serverStartMs) {
+      el._serverStartMs = serverTime.getTime();
+      el._wallClockStartMs = Date.now();
+    }
+    var elapsedMs = Date.now() - el._wallClockStartMs;
+    var currentServerTimeMs = el._serverStartMs + elapsedMs;
+    var diff = endTime.getTime() - currentServerTimeMs;
+    if (status === 'draft') {
+      el.textContent = 'Not yet published';
+      return;
+    }
+    if (diff <= 0) {
+      el.textContent = '00d : 00h : 00m : 00s';
+      var card = el.closest('.poll-card');
+      if (card) {
+        var badge = card.querySelector('.poll-status-badge');
+        if (badge) {
+          badge.textContent = 'closed';
+          badge.classList.remove('badge-success', 'badge-secondary');
+          badge.classList.add('badge-danger');
+        }
+        var shareBtn = card.querySelector('.poll-share-btn');
+        if (shareBtn) {
+          shareBtn.setAttribute('disabled', 'disabled');
+        }
+      }
+      return;
+    }
+    var seconds = Math.floor(diff / 1000);
+    var days = Math.floor(seconds / (3600 * 24));
+    seconds -= days * 3600 * 24;
+    var hours = Math.floor(seconds / 3600);
+    seconds -= hours * 3600;
+    var minutes = Math.floor(seconds / 60);
+    seconds -= minutes * 60;
+    function pad(n) { return n < 10 ? '0' + n : n; }
+    el.textContent = days + 'd : ' + pad(hours) + 'h : ' + pad(minutes) + 'm : ' + pad(seconds) + 's';
+  }
+  document.addEventListener('DOMContentLoaded', function () {
+    var countdownEls = document.querySelectorAll('[data-countdown]');
+    countdownEls.forEach(function (el) { updateCountdown(el); });
+    if (countdownEls.length) {
+      setInterval(function () {
+        countdownEls.forEach(function (el) { updateCountdown(el); });
+      }, 1000);
+    }
+  });
+})();
+</script>
+@endpush

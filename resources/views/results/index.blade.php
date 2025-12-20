@@ -33,7 +33,7 @@
               @endif
             </td>
             <td>
-              <a href="{{ route('polls.results', $poll) }}" class="btn btn-info btn-sm" target="_blank">View Details</a>
+              <a href="{{ route('results.show', $poll->id) }}" class="btn btn-info btn-sm" target="_blank">View Details</a>
             </td>
           </tr>
         @empty

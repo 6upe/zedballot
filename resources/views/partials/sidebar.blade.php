@@ -23,27 +23,16 @@
         </ul>
       </li>
 
-      <li class="nav-item {{ request()->routeIs('voters.*') ? 'active' : '' }}">
-        <a class="nav-link {{ request()->routeIs('voters.*') ? 'active' : '' }}" href="{{ route('voters.index') }}"><i class="fas fa-users"></i> <span>Voters</span></a>
-      </li>
-
-      <li class="nav-item {{ request()->routeIs('results.*') ? 'active' : '' }}">
-        <a class="nav-link {{ request()->routeIs('results.*') ? 'active' : '' }}" href="{{ route('results.index') }}"><i class="fas fa-chart-bar"></i> <span>Results</span></a>
-      </li>
-
-      <li class="nav-item {{ request()->routeIs('reports.*') ? 'active' : '' }}">
-        <a class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}" href="{{ route('reports.index') }}"><i class="fas fa-file-alt"></i> <span>Reports</span></a>
-      </li>
-
-      <li class="nav-item {{ request()->routeIs('settings.*') ? 'active' : '' }}">
-        <a class="nav-link {{ request()->routeIs('settings.*') ? 'active' : '' }}" href="{{ route('settings.index') }}"><i class="fas fa-cog"></i> <span>Settings</span></a>
+          <li class="nav-item {{ request()->routeIs('profile.show') ? 'active' : '' }}">
+        <a class="nav-link {{ request()->routeIs('profile.show') ? 'active' : '' }}" href="{{ route('profile.show') }}"><i class="fas fa-user"></i> <span>My Profile</span></a>
       </li>
     </ul>
 
     <div class="mt-4 mb-4 p-3 hide-sidebar-mini">
       <a href="/" class="btn btn-primary btn-lg btn-block btn-icon-split">
-        <i class="fas fa-home"></i> View Site
+        <i class="fas fa-home"></i> Help & Support
       </a>
     </div>
+
   </aside>
 </div>

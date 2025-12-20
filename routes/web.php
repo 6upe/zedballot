@@ -43,10 +43,8 @@ Route::middleware('auth')->group(function () {
     // Voters
     Route::get('/voters', fn () => view('dashboard.sidebar_items.voters.index'))->name('voters.index');
 
-    // Results, reports, settings
-    Route::get('/results', fn () => view('dashboard.sidebar_items.results.index'))->name('results.index');
-    Route::get('/reports', fn () => view('dashboard.sidebar_items.reports.index'))->name('reports.index');
-    Route::get('/settings', fn () => view('dashboard.sidebar_items.settings.index'))->name('settings.index');
+    // Results, reports, settings (handled in DashboardController)
+    Route::get('/results', [DashboardController::class, 'results'])->name('results.index');
     
     // Profile
     Route::get('/profile', fn () => view('dashboard.sidebar_items.profile.show'))->name('profile.show');

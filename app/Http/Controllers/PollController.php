@@ -969,10 +969,17 @@ class PollController extends Controller
 
         $callback = function () {
             $file = fopen('php://output', 'w');
-            // Header row
-            fputcsv($file, ['name', 'email', 'phone', 'social_link', 'bio']);
-            // Example row
-            fputcsv($file, ['John Doe', 'john@example.com', '+1234567890', 'https://linkedin.com/in/johndoe', 'Experienced professional']);
+            // Header row (added photo_url)
+            fputcsv($file, ['name', 'email', 'phone', 'social_link', 'bio', 'photo_url']);
+            // Example row (added photo_url)
+            fputcsv($file, [
+                'John Doe',
+                'john@example.com',
+                '+1234567890',
+                'https://linkedin.com/in/johndoe',
+                'Experienced professional',
+                'https://example.com/photo.jpg'
+            ]);
             fclose($file);
         };
 
