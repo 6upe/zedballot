@@ -20,17 +20,20 @@ class PollController extends Controller
      | Poll lifecycle
      ======================= */
 
-        public function index()
-        {
-        $polls = Poll::with(['categories', 'nominees'])->orderBy('created_at', 'desc')->get();
+    public function index()
+    {
+        $polls = Poll::with(['categories', 'nominees'])
+            ->where('created_by', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return view('dashboard.sidebar_items.polls.index', compact('polls'));
-        }
+    }
 
-        public function create()
-        {
+    public function create()
+    {
         return view('dashboard.sidebar_items.polls.create');
-        }
+    }
 
     /**
      * Step 1: Create initial poll draft with basic details
@@ -474,6 +477,10 @@ class PollController extends Controller
 
     public function show(Poll $poll)
     {
+        if ($poll->created_by !== Auth::id()) {
+            abort(403, 'Unauthorized access to this poll.');
+        }
+
         $poll->load(['categories.nominees', 'eligibleVoters']);
 
         // Ensure start_at and end_at are ISO 8601 strings for correct JS parsing
@@ -504,6 +511,10 @@ class PollController extends Controller
 
     public function edit(Poll $poll)
     {
+        if ($poll->created_by !== Auth::id()) {
+            abort(403, 'Unauthorized access to this poll.');
+        }
+
         $poll->load(['categories.nominees', 'eligibleVoters']);
 
         // Ensure start_at and end_at are ISO 8601 strings for correct JS parsing
@@ -520,6 +531,10 @@ class PollController extends Controller
 
     public function update(Request $request, Poll $poll)
     {
+        if ($poll->created_by !== Auth::id()) {
+            abort(403, 'Unauthorized access to this poll.');
+        }
+
         $allowedMethods = ['email', 'phone', 'nrc', 'passport', 'biometric_facial', 'biometric_finger'];
 
             $data = $request->validate([
@@ -606,6 +621,10 @@ class PollController extends Controller
 
     public function destroy(Poll $poll)
     {
+        if ($poll->created_by !== Auth::id()) {
+            abort(403, 'Unauthorized access to this poll.');
+        }
+
         $poll->delete();
 
         return redirect()

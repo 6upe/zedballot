@@ -31,10 +31,10 @@ class VoteConfirmationNotification extends Notification implements ShouldQueue
     {
         return (new MailMessage)
             ->subject('Confirm Your Vote for ' . $this->poll->title)
-            ->greeting('Hello ' . ($this->voter->name ?: 'Voter') . ',')
-            ->line('Thank you for voting in the poll: ' . $this->poll->title)
-            ->line('To confirm your vote, please click the button below:')
-            ->action('Confirm Vote', $this->confirmationUrl)
-            ->line('If you did not submit this vote, you can ignore this email.');
+            ->view('emails.vote_confirmation', [
+                'poll' => $this->poll,
+                'voter' => $this->voter,
+                'confirmationUrl' => $this->confirmationUrl,
+            ]);
     }
 }

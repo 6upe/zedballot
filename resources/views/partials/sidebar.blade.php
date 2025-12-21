@@ -1,10 +1,10 @@
 <div class="main-sidebar sidebar-style-2">
   <aside id="sidebar-wrapper">
     <div class="sidebar-brand">
-      <a href="{{ route('dashboard') }}">XXXXXXXXXX</a>
+      <a href="{{ route('dashboard') }}"><img src="{{ asset('assets/img/logo-word.png') }}" width="150" alt="zedballot logo"></a>
     </div>
     <div class="sidebar-brand sidebar-brand-sm">
-      <a href="{{ route('dashboard') }}">XX</a>
+      <a href="{{ route('dashboard') }}"><img src="{{ asset('assets/img/logo-icon.png') }}" width="50" alt="zedballot logo"></a>
     </div>
 
     <ul class="sidebar-menu">

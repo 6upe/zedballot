@@ -1,182 +1,542 @@
-@extends('layouts.website')
+<!DOCTYPE html>
+<html lang="en">
 
-@section('title', 'Welcome to ZedBallot')
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-@section('content')
-<main>
-    <nav class="navbar navbar-expand-lg navbar-light bg-success shadow-sm">
-        <div class="container">
-            <a class="navbar-brand fw-bold d-flex align-items-center me-lg-5 me-0" href="{{ url('/') }}">
-                <img src="{{ asset('website-assets/images/pod-talk-logo.png') }}" alt="ZedBallot" class="me-2" style="height:40px;">
-                <span>ZedBallot</span>
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-lg-auto align-items-lg-center">
-                    <li class="nav-item"><a class="nav-link {{ request()->is('/') ? 'active' : '' }}" href="{{ url('/') }}">Home</a></li>
-                    <li class="nav-item"><a class="nav-link {{ request()->is('polls*') ? 'active' : '' }}" href="/">Polls</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/contact">Contact</a></li>
-                </ul>
-                <div class="ms-lg-4 mt-3 mt-lg-0 d-flex gap-2">
-                    @auth
-                    <a href="/dashboard" class="btn btn-outline-primary">Dashboard</a>
-                    @else
-                    <a href="/login" class="btn btn-outline-primary">Login</a>
-                    <a href="/polls/create" class="btn btn-primary">Create Poll</a>
-                    @endauth
-                </div>
-            </div>
-        </div>
-    </nav>
+    {{-- Dynamic Page Title --}}
+    <title>@yield('title', 'ZedBallot — Secure Online Voting & Polling Platform')</title>
 
-    <section class="hero-section py-5" style="background: linear-gradient(120deg, #007bff 0%, #00c6ff 100%); color: #fff;">
-        <div class="container text-center">
-            <h1 class="display-4 fw-bold mb-3">Modern, Secure Online Voting</h1>
-            <p class="lead mb-4">ZedBallot empowers organizations, communities, and teams to run transparent, trusted, and easy-to-manage online elections and polls.</p>
-            <a href="/register" class="btn btn-lg btn-light fw-bold shadow">Get Started Free</a>
-        </div>
-    </section>
+    {{-- Primary Meta --}}
+    <meta name="description" content="@yield('meta_description', 'ZedBallot is a secure, transparent, and easy-to-use online voting and polling platform designed for organizations, institutions, and public elections.')">
+    <meta name="keywords" content="online voting, polling system, secure elections, digital ballots, voting platform, Zambia voting system">
 
-    <section class="py-5 bg-light">
-        <div class="container">
-            <div class="row text-center">
-                <div class="col-md-4 mb-4">
-                    <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
-                    <h5 class="fw-bold">Secure & Private</h5>
-                    <p class="text-muted">End-to-end encryption, robust authentication, and audit trails ensure every vote is safe and verifiable.</p>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <i class="fas fa-mobile-alt fa-3x text-primary mb-3"></i>
-                    <h5 class="fw-bold">Accessible Anywhere</h5>
-                    <p class="text-muted">Fully responsive and mobile-friendly, so everyone can participate from any device, anywhere.</p>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <i class="fas fa-chart-bar fa-3x text-primary mb-3"></i>
-                    <h5 class="fw-bold">Instant Results</h5>
-                    <p class="text-muted">Get real-time analytics and results as votes come in. Visualize outcomes with clear, interactive reports and charts.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+    {{-- Author & App Info --}}
+    <meta name="author" content="ZedBallot">
+    <meta name="application-name" content="ZedBallot">
 
-    <section class="py-5">
-        <div class="container">
-            <div class="text-center mb-5">
-                <h2 class="fw-bold">How ZedBallot Works</h2>
-                <p class="text-muted">Simple, secure, and designed for trust.</p>
-            </div>
-            <div class="row text-center">
-                <div class="col-md-4 mb-4">
-                    <div class="p-4 border rounded h-100">
-                        <span class="badge bg-primary mb-3">Step 1</span>
-                        <h5 class="fw-bold">Create a Poll</h5>
-                        <p class="text-muted">Admins define categories, nominees, voting rules, and timelines in minutes.</p>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <div class="p-4 border rounded h-100">
-                        <span class="badge bg-primary mb-3">Step 2</span>
-                        <h5 class="fw-bold">Verify & Vote</h5>
-                        <p class="text-muted">Voters verify their identity and cast one secure vote per category.</p>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <div class="p-4 border rounded h-100">
-                        <span class="badge bg-primary mb-3">Step 3</span>
-                        <h5 class="fw-bold">View Results</h5>
-                        <p class="text-muted">Results are calculated instantly and displayed transparently.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    {{-- Favicons --}}
+    <link rel="icon" href="{{ asset('website-asset/assets/img/logo-icon.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('assets/img/logo-icon.png') }}">
 
-    <section class="py-5 bg-light">
-        <div class="container">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h3 class="fw-bold mb-0">Active Polls</h3>
-                <a href="{{ route('polls.index') }}" class="text-decoration-none">View All →</a>
-            </div>
-            <div class="row">
-                @forelse($activePolls ?? [] as $poll)
-                <div class="col-md-4 mb-4">
-                    <div class="card shadow-sm h-100">
-                        @if($poll->cover_image)
-                        <img src="{{ asset('storage/'.$poll->cover_image) }}" class="card-img-top" style="height:200px;object-fit:cover;">
-                        @endif
-                        <div class="card-body">
-                            <h5 class="card-title">{{ $poll->name }}</h5>
-                            <p class="text-muted small">Ends {{ $poll->end_at?->diffForHumans() }}</p>
-                            <a href="{{ route('polls.vote', $poll) }}" class="btn btn-primary w-100">Vote Now</a>
-                        </div>
-                    </div>
-                </div>
-                @empty
-                <div class="col-12 text-center text-muted">No active polls at the moment.</div>
-                @endforelse
-            </div>
-        </div>
-    </section>
+    {{-- Fonts --}}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <section class="py-5 text-white" style="background:linear-gradient(135deg,#0f172a,#1e293b);">
-        <div class="container text-center">
-            <h2 class="fw-bold mb-3">Ready to Run a Trusted Vote?</h2>
-            <p class="mb-4">Create transparent, secure polls with confidence using ZedBallot.</p>
-            <a href="{{ route('polls.create') }}" class="btn btn-light btn-lg fw-semibold">Get Started</a>
-        </div>
-    </section>
-</main>
+    <link href="https://fonts.googleapis.com/css2?
+        family=Roboto:ital,wght@0,300;0,400;0,500;0,700;0,900;1,300;1,400;1,500;1,700;1,900&
+        family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700&
+        family=Raleway:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700
+        &display=swap"
+        rel="stylesheet">
 
-<footer class="site-footer bg-white border-top mt-5 pt-5">
+    {{-- Vendor CSS --}}
+    <link href="{{ asset('website-asset/assets/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('website-asset/assets/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+    <link href="{{ asset('website-asset/assets/vendor/aos/aos.css') }}" rel="stylesheet">
+    <link href="{{ asset('website-asset/assets/vendor/glightbox/css/glightbox.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('website-asset/assets/vendor/swiper/swiper-bundle.min.css') }}" rel="stylesheet">
+
+    {{-- Main Styles --}}
+    <link href="{{ asset('website-asset/assets/css/main.css') }}" rel="stylesheet">
+
+    {{-- Extra Page Styles --}}
+    @stack('styles')
+</head>
+
+
+<body class="index-page">
+
+<header id="header" class="header d-flex align-items-center sticky-top">
+    <div class="container-fluid container-xl position-relative d-flex align-items-center">
+
+        {{-- Logo --}}
+        <a href="{{ url('/') }}" class="logo d-flex align-items-center me-auto">
+            {{-- Image logo (optional) --}}
+            <img src="{{ asset('website-asset/assets/img/logo-word.png') }}" alt="ZedBallot Logo">
+            <!-- <h1 class="sitename">Zed<span>Ballot</span></h1> -->
+        </a>
+
+        {{-- Navigation --}}
+        <nav id="navmenu" class="navmenu">
+            <ul>
+                <li><a href="#hero" class="active">Home</a></li>
+
+                <li><a href="#about">About</a></li>
+
+                <li><a href="#how-it-works">How It Works</a></li>
+
+                <li><a href="#security">Security</a></li>
+
+                <li><a href="#contact">Contact</a></li>
+
+               
+            </ul>
+
+            <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+        </nav>
+
+         {{-- Auth-ready links (optional later) --}}
+              
+                @auth
+                    <a class="btn-getstarted" href="{{ route('dashboard') }}">Dashboard</a>
+                @else
+                    <a class="btn-getstarted" href="{{ route('login') }}">Create a Poll</a>
+                @endauth
+                
+     
+        
+
+    </div>
+</header>
+
+
+  <main class="main">
+
+<!-- Hero Section -->
+<section id="hero" class="hero section">
+
+    {{-- Background Image --}}
+    <img src="{{ asset('website-asset/assets/img/hero-bg-abstract.jpg') }}" alt="ZedBallot Secure Online Voting" data-aos="fade-in">
+
     <div class="container">
-        <div class="row">
-            <div class="col-lg-6 col-12 mb-5 mb-lg-0">
-                <div class="subscribe-form-wrap">
-                    <h6>Subscribe for Updates</h6>
-                    <form class="custom-form subscribe-form" action="#" method="get" role="form">
-                        <input type="email" name="subscribe-email" id="subscribe-email" pattern="[^ @]*@[^ @]*" class="form-control" placeholder="Email Address" required="">
-                        <div class="col-lg-12 col-12">
-                            <button type="submit" class="form-control" id="submit">Subscribe</button>
-                        </div>
-                    </form>
+        {{-- Main Heading --}}
+        <div class="row justify-content-center" data-aos="zoom-out">
+            <div class="col-xl-8 col-lg-9 text-center">
+                <h1>Secure, Transparent & Smart Online Voting</h1>
+                <p>
+                    ZedBallot is a modern online polling and election platform designed for
+                    organizations, institutions, communities, and awards — enabling fair,
+                    time-based, and fraud-resistant voting from anywhere.
+                </p>
+            </div>
+        </div>
+
+        {{-- Primary CTA --}}
+        <div class="text-center" data-aos="zoom-out" data-aos-delay="100">
+            <a href="/login" class="btn-get-started">Create Your First Poll</a>
+        </div>
+
+        {{-- Feature Highlights --}}
+        <div class="row gy-4 mt-5">
+
+            <div class="col-md-6 col-lg-3" data-aos="zoom-out" data-aos-delay="100">
+                <div class="icon-box">
+                    <div class="icon"><i class="bi bi-shield-lock"></i></div>
+                    <h4 class="title">Secure Voting</h4>
+                    <p class="description">
+                        Built with strong validation, eligibility control, and one-vote-per-voter enforcement.
+                    </p>
                 </div>
-            </div>
-            <div class="col-lg-3 col-md-6 col-12 mb-4 mb-md-0 mb-lg-0">
-                <h6 class="site-footer-title mb-3">Contact</h6>
-                <p class="mb-2"><strong class="d-inline me-2">Phone:</strong> 010-020-0340</p>
-                <p><strong class="d-inline me-2">Email:</strong> <a href="#">info@zedballot.com</a></p>
-            </div>
-            <div class="col-lg-3 col-md-6 col-12">
-                <h6 class="site-footer-title mb-3">Social</h6>
-                <ul class="social-icon">
-                    <li class="social-icon-item"><a href="#" class="social-icon-link bi-instagram"></a></li>
-                    <li class="social-icon-item"><a href="#" class="social-icon-link bi-twitter"></a></li>
-                    <li class="social-icon-item"><a href="#" class="social-icon-link bi-whatsapp"></a></li>
-                </ul>
-            </div>
+            </div><!-- End Icon Box -->
+
+            <div class="col-md-6 col-lg-3" data-aos="zoom-out" data-aos-delay="200">
+                <div class="icon-box">
+                    <div class="icon"><i class="bi bi-clock-history"></i></div>
+                    <h4 class="title">Time-Based Polls</h4>
+                    <p class="description">
+                        Schedule polls with precise start and end times that automatically open and close.
+                    </p>
+                </div>
+            </div><!-- End Icon Box -->
+
+            <div class="col-md-6 col-lg-3" data-aos="zoom-out" data-aos-delay="300">
+                <div class="icon-box">
+                    <div class="icon"><i class="bi bi-people"></i></div>
+                    <h4 class="title">Flexible Eligibility</h4>
+                    <p class="description">
+                        Public or private polls with email, ID, CSV imports, or self-registration links.
+                    </p>
+                </div>
+            </div><!-- End Icon Box -->
+
+            <div class="col-md-6 col-lg-3" data-aos="zoom-out" data-aos-delay="400">
+                <div class="icon-box">
+                    <div class="icon"><i class="bi bi-bar-chart-line"></i></div>
+                    <h4 class="title">Live Results</h4>
+                    <p class="description">
+                        View real-time results with transparent vote counts and category breakdowns.
+                    </p>
+                </div>
+            </div><!-- End Icon Box -->
+
         </div>
     </div>
-    <div class="container pt-5">
-        <div class="row align-items-center">
-            <div class="col-lg-2 col-md-3 col-12">
-                <a class="navbar-brand" href="/">
-                    <img src="{{ asset('website-assets/images/pod-talk-logo.png') }}" class="logo-image img-fluid" alt="ZedBallot logo">
+
+</section>
+<!-- /Hero Section -->
+
+
+<!-- About Section -->
+<section id="about" class="about section">
+
+    <!-- Section Title -->
+    <div class="container section-title" data-aos="fade-up">
+        <h2>    <img src="{{ asset('website-asset/assets/img/logo-word.png') }}" alt="ZedBallot Logo"></h2>
+        <p>A trusted digital voting platform built for fairness, transparency, and scale</p>
+    </div><!-- End Section Title -->
+
+    <div class="container">
+
+        <div class="row gy-4">
+
+            {{-- Left Content --}}
+            <div class="col-lg-6 content" data-aos="fade-up" data-aos-delay="100">
+                <p>
+                    ZedBallot was created to modernize how organizations conduct polls, elections,
+                    and voting-based decisions. From awards and associations to institutions and
+                    private organizations, we provide a secure and reliable way to collect votes online.
+                </p>
+
+                <ul>
+                    <li>
+                        <i class="bi bi-check2-circle"></i>
+                        <span>Designed to prevent duplicate voting and enforce eligibility rules.</span>
+                    </li>
+                    <li>
+                        <i class="bi bi-check2-circle"></i>
+                        <span>Supports public and private polls with flexible voter identification.</span>
+                    </li>
+                    <li>
+                        <i class="bi bi-check2-circle"></i>
+                        <span>Automatically manages poll timing, status, and result visibility.</span>
+                    </li>
+                </ul>
+            </div>
+
+            {{-- Right Content --}}
+            <div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
+                <p>
+                    Unlike traditional voting tools, ZedBallot is built with real-world challenges in mind —
+                    time zones, voter verification, data integrity, and scalability. Every poll is backed
+                    by structured logic that ensures each voter participates only once, and every vote
+                    is counted accurately.
+                </p>
+
+                <p>
+                    Whether you are running a small internal vote or a large public poll,
+                    ZedBallot gives you confidence, clarity, and control — all from a simple,
+                    intuitive interface.
+                </p>
+
+                <a href="/register" class="read-more">
+                    <span>Sign up Now!</span>
+                    <i class="bi bi-arrow-right"></i>
                 </a>
             </div>
-            <div class="col-lg-7 col-md-9 col-12">
-                <ul class="site-footer-links">
-                    <li class="site-footer-link-item"><a href="#" class="site-footer-link">Homepage</a></li>
-                    <li class="site-footer-link-item"><a href="#" class="site-footer-link">Help Center</a></li>
-                    <li class="site-footer-link-item"><a href="#" class="site-footer-link">Contact Us</a></li>
-                </ul>
-            </div>
-            <div class="col-lg-3 col-12">
-                <p class="copyright-text mb-0">Copyright © {{ date('Y') }} ZedBallot</p>
+
+        </div>
+
+    </div>
+
+</section>
+<!-- /About Section -->
+
+
+<!-- Stats Section -->
+<section id="stats" class="stats section light-background">
+
+    <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+        <div class="row gy-4">
+
+            <!-- Total Polls -->
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-item text-center w-100 h-100">
+                    <span
+                        data-purecounter-start="0"
+                        data-purecounter-end="120"
+                        data-purecounter-duration="1.2"
+                        class="purecounter"></span>
+                    <p>Polls Created</p>
+                </div>
+            </div><!-- End Stats Item -->
+
+            <!-- Votes Cast -->
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-item text-center w-100 h-100">
+                    <span
+                        data-purecounter-start="0"
+                        data-purecounter-end="18500"
+                        data-purecounter-duration="1.4"
+                        class="purecounter"></span>
+                    <p>Votes Successfully Cast</p>
+                </div>
+            </div><!-- End Stats Item -->
+
+            <!-- Organizations -->
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-item text-center w-100 h-100">
+                    <span
+                        data-purecounter-start="0"
+                        data-purecounter-end="48"
+                        data-purecounter-duration="1"
+                        class="purecounter"></span>
+                    <p>Organizations Using ZedBallot</p>
+                </div>
+            </div><!-- End Stats Item -->
+
+            <!-- System Reliability -->
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-item text-center w-100 h-100">
+                    <span
+                        data-purecounter-start="0"
+                        data-purecounter-end="99"
+                        data-purecounter-duration="1"
+                        class="purecounter"></span>
+                    <p>% Voting Uptime</p>
+                </div>
+            </div><!-- End Stats Item -->
+
+        </div>
+
+    </div>
+
+</section>
+<!-- /Stats Section -->
+
+
+
+<!-- Call To Action Section -->
+<section id="call-to-action" class="call-to-action section accent-background">
+
+    <div class="container">
+        <div class="row justify-content-center" data-aos="zoom-in" data-aos-delay="100">
+            <div class="col-xl-10">
+                <div class="text-center">
+
+                    <h3>Launch Your Poll in Minutes</h3>
+
+                    <p>
+                        Create secure, transparent, and time-controlled polls for organizations,
+                        communities, awards, or elections. ZedBallot gives you full control over
+                        voter eligibility, voting windows, and real-time results — without complexity.
+                    </p>
+
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <a class="cta-btn" href="{{ route('polls.create') }}">
+                            Create a Poll
+                        </a>
+
+                        <a class="cta-btn cta-btn-outline" href="#about">
+                            Learn How It Works
+                        </a>
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>
+
+</section>
+<!-- /Call To Action Section -->
+
+
+<!-- Faq Section -->
+<section id="faq" class="faq section light-background">
+
+    <!-- Section Title -->
+    <div class="container section-title" data-aos="fade-up">
+        <h2>Frequently Asked Questions</h2>
+        <p>Everything you need to know before creating or participating in a poll.</p>
+    </div>
+    <!-- End Section Title -->
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10" data-aos="fade-up" data-aos-delay="100">
+
+                <div class="faq-container">
+
+                    <!-- FAQ Item -->
+                    <div class="faq-item faq-active">
+                        <h3>How does ZedBallot ensure voting fairness?</h3>
+                        <div class="faq-content">
+                            <p>
+                                Each poll enforces strict voting rules. Voters are uniquely identified
+                                using configured identifiers (email, phone, NRC, passport, or system ID),
+                                ensuring one person can only vote once per poll.
+                            </p>
+                        </div>
+                        <i class="faq-toggle bi bi-chevron-right"></i>
+                    </div>
+
+                    <!-- FAQ Item -->
+                    <div class="faq-item">
+                        <h3>What is the difference between public and private polls?</h3>
+                        <div class="faq-content">
+                            <p>
+                                Public polls allow anyone with the poll link to vote, while private polls
+                                restrict participation to pre-approved voters defined by the poll organizer.
+                                Eligibility is verified before any vote is accepted.
+                            </p>
+                        </div>
+                        <i class="faq-toggle bi bi-chevron-right"></i>
+                    </div>
+
+                    <!-- FAQ Item -->
+                    <div class="faq-item">
+                        <h3>Can voters change their votes?</h3>
+                        <div class="faq-content">
+                            <p>
+                                This depends on the poll configuration. Organizers may allow or disallow
+                                vote editing. Once the voting window closes, all votes are permanently locked.
+                            </p>
+                        </div>
+                        <i class="faq-toggle bi bi-chevron-right"></i>
+                    </div>
+
+                    <!-- FAQ Item -->
+                    <div class="faq-item">
+                        <h3>How does ZedBallot handle timezones?</h3>
+                        <div class="faq-content">
+                            <p>
+                                All poll timing is controlled by server time to prevent manipulation.
+                                While users may be in different timezones, poll start and end times
+                                are enforced consistently to guarantee fairness.
+                            </p>
+                        </div>
+                        <i class="faq-toggle bi bi-chevron-right"></i>
+                    </div>
+
+                    <!-- FAQ Item -->
+                    <div class="faq-item">
+                        <h3>What happens when a poll closes?</h3>
+                        <div class="faq-content">
+                            <p>
+                                Once a poll reaches its end time, voting automatically stops.
+                                Results become available immediately or remain hidden depending
+                                on the organizer’s settings.
+                            </p>
+                        </div>
+                        <i class="faq-toggle bi bi-chevron-right"></i>
+                    </div>
+
+                    <!-- FAQ Item -->
+                    <div class="faq-item">
+                        <h3>Is my data secure?</h3>
+                        <div class="faq-content">
+                            <p>
+                                Yes. ZedBallot follows best practices for data protection.
+                                Sensitive voter identifiers are stored securely and are never
+                                shared or exposed publicly.
+                            </p>
+                        </div>
+                        <i class="faq-toggle bi bi-chevron-right"></i>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</section>
+<!-- /Faq Section -->
+
+
+  </main>
+
+<footer id="footer" class="footer light-background">
+
+    <div class="container footer-top">
+        <div class="row gy-4">
+
+            <!-- Brand / About -->
+            <div class="col-lg-5 col-md-12 footer-about">
+                <a href="{{ url('/') }}" class="logo d-flex align-items-center">
+                    <span class="sitename">ZedBallot</span>
+                </a>
+                <p>
+                    ZedBallot is a secure, transparent, and flexible online voting platform
+                    designed for elections, awards, surveys, and decision-making at any scale.
+                </p>
+
+                <div class="social-links d-flex mt-4">
+                    <a href="#" aria-label="Twitter"><i class="bi bi-twitter-x"></i></a>
+                    <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+                    <a href="#" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+                </div>
+            </div>
+
+            <!-- Useful Links -->
+            <div class="col-lg-2 col-6 footer-links">
+                <h4>Platform</h4>
+                <ul>
+                    <li><a href="#hero">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#services">Features</a></li>
+                    <li><a href="#faq">FAQ</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+
+            <!-- Services / Features -->
+            <div class="col-lg-2 col-6 footer-links">
+                <h4>Solutions</h4>
+                <ul>
+                    <li><a href="#">Online Voting</a></li>
+                    <li><a href="#">Private Elections</a></li>
+                    <li><a href="#">Awards & Polls</a></li>
+                    <li><a href="#">Voter Verification</a></li>
+                    <li><a href="#">Live Results</a></li>
+                </ul>
+            </div>
+
+            <!-- Contact -->
+            <div class="col-lg-3 col-md-12 footer-contact text-center text-md-start">
+                <h4>Contact</h4>
+                <p>Zambia</p>
+                <p class="mt-4">
+                    <strong>Email:</strong>
+                    <span>support@zedballot.com</span>
+                </p>
+                <p>
+                    <strong>Support:</strong>
+                    <span>24/7 Online Assistance</span>
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Copyright -->
+    <div class="container copyright text-center mt-4">
+        <p>
+            © {{ date('Y') }}
+            <strong class="px-1 sitename">ZedBallot</strong>
+            <span>All Rights Reserved</span>
+        </p>
+
+        <div class="credits">
+            Built with security, transparency, and trust in mind.
+        </div>
+    </div>
+
 </footer>
-@endsection
+
+
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+<!-- Vendor JS Files -->
+<script src="{{ asset('website-asset/assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ asset('website-asset/assets/vendor/aos/aos.js') }}"></script>
+<script src="{{ asset('website-asset/assets/vendor/purecounter/purecounter_vanilla.js') }}"></script>
+<script src="{{ asset('website-asset/assets/vendor/glightbox/js/glightbox.min.js') }}"></script>
+<script src="{{ asset('website-asset/assets/vendor/swiper/swiper-bundle.min.js') }}"></script>
+<script src="{{ asset('website-asset/assets/vendor/imagesloaded/imagesloaded.pkgd.min.js') }}"></script>
+<script src="{{ asset('website-asset/assets/vendor/isotope-layout/isotope.pkgd.min.js') }}"></script>
+
+<!-- Main JS File -->
+<script src="{{ asset('website-asset/assets/js/main.js') }}"></script>
+
+
+</body>
+
+</html>
