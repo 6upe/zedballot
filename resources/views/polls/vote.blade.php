@@ -8,6 +8,17 @@
     <link rel="stylesheet" href="{{ asset('assets/modules/bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/modules/fontawesome/css/all.min.css') }}">
     <style>
+                body {
+                    min-height: 100vh;
+                    background: linear-gradient(-45deg, #000, #43ea7f, #ff9800, #d32f2f, #000 90%);
+                    background-size: 400% 400%;
+                    animation: gradientBG 18s ease infinite;
+                }
+                @keyframes gradientBG {
+                    0% {background-position: 0% 50%;}
+                    50% {background-position: 100% 50%;}
+                    100% {background-position: 0% 50%;}
+                }
         .poll-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -29,39 +40,50 @@
             margin-bottom: 1rem;
         }
         .category-card {
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 18px;
             padding: 1.5rem;
             margin-bottom: 2rem;
-            background: white;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            background: rgba(30,30,30,0.55);
+            box-shadow: 0 8px 32px 0 rgba(31,38,135,0.18);
+            backdrop-filter: blur(8px);
         }
-        .nominee-option {
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            background: white;
+        .profile-card {
+            background: rgba(0, 0, 0, 0.18);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px 0 rgba(31,38,135,0.18);
+            padding: 2.5rem 1.5rem 2rem 1.5rem;
+            text-align: center;
+            min-height: 260px;
+            position: relative;
+            backdrop-filter: blur(12px);
+            border: 1.5px solid rgba(255,255,255,0.18);
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
         }
-        .nominee-option:hover {
-            border-color: #667eea;
-            background: #f8f9ff;
+        .profile-card.selected {
+            border-color: #ff9800;
+            background: #fff;
+            box-shadow: 0 0 0 4px #ff980088;
         }
-        .nominee-option input[type="radio"] {
-            cursor: pointer;
+        .profile-card h5 {
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.18);
         }
-        .nominee-option.selected {
-            border-color: #667eea;
-            background: #f0f2ff;
-        }
-        .nominee-photo {
-            width: 60px;
-            height: 60px;
+        .profile-photo {
+            width: 110px;
+            height: 110px;
             object-fit: cover;
-            border-radius: 6px;
-            margin-right: 1rem;
+            border-radius: 50%;
+            margin: 0 auto 1rem auto;
+            border: 4px solid #ff9800;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 12px rgba(255,152,0,0.12);
         }
         .status-badge {
             padding: 0.5rem 1rem;
@@ -176,6 +198,7 @@
 
         <h3 class="mb-4"><i class="fas fa-list mr-2"></i>Categories & Nominees</h3>
 
+
         @if($poll->categories && $poll->categories->count() > 0)
             <form id="votingForm" method="POST" action="{{ route('polls.vote.submit', $poll) }}">
                 @csrf
@@ -248,47 +271,53 @@
 
                         @php
                             $categoryNominees = $poll->nominees->where('category_id', $category->id);
+                            $maxVotes = $categoryNominees->max('vote_count');
+                            $repeatCount = 5;
+                            $cards = collect();
+                            for ($i = 0; $i < $repeatCount; $i++) {
+                                foreach ($categoryNominees as $nominee) {
+                                    $cards->push($nominee);
+                                }
+                            }
                         @endphp
 
                         @if($categoryNominees->count() > 0)
-                            <div class="nominees-list">
-                                @foreach($categoryNominees as $nominee)
-                                    <label class="nominee-option" onclick="this.querySelector('input').checked = true;">
-                                        <div class="d-flex align-items-start">
-                                            <input type="radio" name="votes[{{ $category->id }}]" value="{{ $nominee->id }}" 
-                                                   style="margin-top: 0.5rem;">
-                                            <div class="flex-grow-1">
+                            <div class="nominee-carousel-container">
+                                <div class="custom-nominee-carousel" id="custom-carousel-{{ $category->id }}" style="overflow: hidden; position: relative; width: 100%;">
+                                    <div class="custom-carousel-track d-flex align-items-center justify-content-center" style="transition: transform 0.7s cubic-bezier(.4,2,.6,1); will-change: transform;">
+                                        @foreach($cards as $i => $nominee)
+                                            <div class="profile-card custom-carousel-card" data-index="{{ $i }}" style="min-width: 320px; max-width: 340px; margin: 0 1rem; position: relative;">
+                                                <input type="radio" name="votes[{{ $category->id }}]" value="{{ $nominee->id }}" id="vote-{{ $category->id }}-{{ $nominee->id }}-{{ $i }}" class="visually-hidden">
                                                 @if($nominee->photo)
-                                                    <img src="{{ asset('storage/'.$nominee->photo) }}" alt="{{ $nominee->name }}" 
-                                                         class="nominee-photo">
+                                                    <img src="{{ asset('storage/'.$nominee->photo) }}" alt="{{ $nominee->name }}" class="profile-photo mb-2">
                                                 @else
-                                                    <div class="nominee-photo" style="background: #e0e0e0; display: flex; align-items: center; justify-content: center;">
-                                                        <i class="fas fa-user" style="font-size: 24px; color: #999;"></i>
+                                                    <div class="profile-photo mb-2">
+                                                        <i class="fas fa-user" style="font-size: 48px; color: #999;"></i>
                                                     </div>
                                                 @endif
-                                                <div class="d-inline-block flex-grow-1 ml-2">
-                                                    <h6 class="mb-1">{{ $nominee->name }}</h6>
-                                                    @if($nominee->email)
-                                                        <p class="text-muted small mb-1"><i class="fas fa-envelope mr-1"></i>{{ $nominee->email }}</p>
-                                                    @endif
-                                                    @if($nominee->phone)
-                                                        <p class="text-muted small mb-1"><i class="fas fa-phone mr-1"></i>{{ $nominee->phone }}</p>
-                                                    @endif
-                                                    @if($nominee->bio)
-                                                        <p class="text-muted small mb-2">{{ Str::limit($nominee->bio, 120) }}</p>
-                                                    @endif
-                                                    @if($nominee->social_link)
-                                                        <p class="small mb-0">
-                                                            <a href="{{ $nominee->social_link }}" target="_blank" rel="noopener">
-                                                                <i class="fas fa-external-link-alt mr-1"></i>Profile
-                                                            </a>
-                                                        </p>
-                                                    @endif
-                                                </div>
+                                                <h5>{{ $nominee->name }}</h5>
+                                                @if($nominee->bio)
+                                                    <p class="text-muted small mb-1">{{ Str::limit($nominee->bio, 180) }}</p>
+                                                @endif
+                                                @if($nominee->email)
+                                                    <p class="text-muted small mb-1"><i class="fas fa-envelope mr-1"></i>{{ $nominee->email }}</p>
+                                                @endif
+                                                @if($nominee->phone)
+                                                    <p class="text-muted small mb-1"><i class="fas fa-phone mr-1"></i>{{ $nominee->phone }}</p>
+                                                @endif
+                                                @if($nominee->social_link)
+                                                    <p class="small mb-1">
+                                                        <a href="{{ $nominee->social_link }}" target="_blank" rel="noopener">
+                                                            <i class="fas fa-external-link-alt mr-1"></i>Profile
+                                                        </a>
+                                                    </p>
+                                                @endif
                                             </div>
-                                        </div>
-                                    </label>
-                                @endforeach
+                                        @endforeach
+                                    </div>
+                                    <button type="button" class="btn btn-link custom-carousel-prev" style="position:absolute;left:0;top:50%;transform:translateY(-50%);z-index:10;font-size:2rem;color:#fff;"><i class="fas fa-chevron-left"></i></button>
+                                    <button type="button" class="btn btn-link custom-carousel-next" style="position:absolute;right:0;top:50%;transform:translateY(-50%);z-index:10;font-size:2rem;color:#fff;"><i class="fas fa-chevron-right"></i></button>
+                                </div>
                             </div>
                         @else
                             <p class="text-muted">No nominees in this category.</p>
@@ -318,20 +347,129 @@
     <script src="{{ asset('assets/modules/jquery.min.js') }}"></script>
     <script src="{{ asset('assets/modules/bootstrap/js/bootstrap.min.js') }}"></script>
     <script>
-        // Highlight selected nominee option
-        document.querySelectorAll('.nominee-option input').forEach(input => {
-            input.addEventListener('change', function() {
-                // Remove selected class from siblings
-                this.parentElement.parentElement.querySelectorAll('.nominee-option').forEach(opt => {
-                    opt.classList.remove('selected');
-                });
-                // Add selected class to parent
-                this.closest('.nominee-option').classList.add('selected');
+    // Prevent form submit on Enter except on submit button
+    document.addEventListener('DOMContentLoaded', function() {
+        var form = document.getElementById('votingForm');
+        if (form) {
+            form.addEventListener('keydown', function(e) {
+                var tag = e.target.tagName.toLowerCase();
+                if (e.key === 'Enter' && (tag === 'input' || tag === 'select')) {
+                    // Prevent Enter from submitting the form unless on a textarea or submit button
+                    if (e.target.type !== 'submit' && e.target.type !== 'textarea') {
+                        e.preventDefault();
+                        return false;
+                    }
+                }
             });
+            // Defensive: prevent accidental submit by Enter key on form
+            form.addEventListener('submit', function(e) {
+                if (document.activeElement && document.activeElement.tagName.toLowerCase() !== 'button') {
+                    // Only allow submit if triggered by button
+                    // (optional: comment out if you want Enter on button to work)
+                    // e.preventDefault();
+                }
+            });
+        }
+    });
+    // Custom nominee carousel for smooth sliding, always centered, and infinite loop for 1/2 nominees
+   document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.custom-nominee-carousel').forEach(carousel => {
+
+        const track = carousel.querySelector('.custom-carousel-track');
+        const cards = carousel.querySelectorAll('.custom-carousel-card');
+        const prevBtn = carousel.querySelector('.custom-carousel-prev');
+        const nextBtn = carousel.querySelector('.custom-carousel-next');
+
+        const total = cards.length;
+        const realCount = total / 5; // original nominees count
+
+        // Start in the middle block
+        let current = Math.floor(total / 2);
+
+        function update(animate = true) {
+            track.style.transition = animate
+                ? 'transform 0.7s cubic-bezier(.4,2,.6,1)'
+                : 'none';
+
+            const carouselCenter = carousel.clientWidth / 2;
+            const card = cards[current];
+            const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+            const offset = carouselCenter - cardCenter;
+
+            track.style.transform = `translateX(${offset}px)`;
+
+            cards.forEach((c, i) => {
+                const d = Math.abs(i - current);
+                c.style.opacity = d === 0 ? '1' : d === 1 ? '0.6' : '0.3';
+                c.style.transform = d === 0 ? 'scale(1.08)' : d === 1 ? 'scale(0.95)' : 'scale(0.85)';
+                c.style.zIndex = d === 0 ? '3' : d === 1 ? '2' : '1';
+            });
+        }
+
+        function jumpIfNeeded() {
+            // Jump silently when leaving middle block
+            if (current < realCount) {
+                current += realCount * 2;
+                update(false);
+            }
+            if (current >= total - realCount) {
+                current -= realCount * 2;
+                update(false);
+            }
+        }
+
+        nextBtn.addEventListener('click', () => {
+            current++;
+            update();
+            setTimeout(jumpIfNeeded, 750);
         });
 
-        // Handle form submission
-        // Remove JS alert and allow normal form submission
+        prevBtn.addEventListener('click', () => {
+            current--;
+            update();
+            setTimeout(jumpIfNeeded, 750);
+        });
+
+        // Auto slide
+        let auto = setInterval(() => nextBtn.click(), 3500);
+        carousel.addEventListener('mouseenter', () => clearInterval(auto));
+        carousel.addEventListener('mouseleave', () => {
+            auto = setInterval(() => nextBtn.click(), 3500);
+        });
+
+        // Initial
+        update(false);
+        window.addEventListener('resize', () => update(false));
+    });
+});
+
+    // Highlight selected profile card
+    document.addEventListener('change', function(e) {
+        if (e.target.matches('.profile-card input[type="radio"]')) {
+            const group = e.target.name;
+            const value = e.target.value;
+            document.querySelectorAll('input[name="' + group + '"]').forEach(input => {
+                const card = input.closest('.profile-card');
+                if (input.value === value) {
+                    card.classList.add('selected');
+                } else {
+                    card.classList.remove('selected');
+                }
+            });
+        }
+    });
+    // Also allow clicking the card itself to select
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.profile-card').forEach(card => {
+            card.onclick = function(e) {
+                const radio = card.querySelector('input[type="radio"]');
+                if (radio && !radio.checked) {
+                    radio.checked = true;
+                    radio.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            };
+        });
+    });
     </script>
 </body>
 </html>

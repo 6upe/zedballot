@@ -143,12 +143,9 @@
                                     <div class="btn-group mb-2" role="group">
                                         <a href="{{ route('polls.edit', $poll) }}"
                                             class="btn btn-sm btn-outline-primary" title="Edit">
-                                            <i class="fas fa-edit"></i>
+                                            <i class="fas fa-edit"></i>edit
                                         </a>
-                                        <a href="{{ route('polls.show', $poll) }}" class="btn btn-sm btn-outline-info"
-                                            title="View">
-
-                                        </a>
+                                       
                                         <a href="{{ route('polls.results', $poll) }}"
                                             class="btn btn-sm btn-outline-success poll-share-link" title="Results" target="_blank" data-share-url="{{ route('polls.results', $poll) }}">
                                             <i class="fas fa-chart-bar"></i> Results

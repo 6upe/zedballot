@@ -12,6 +12,22 @@
   <!-- Template CSS -->
   <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
   <link rel="stylesheet" href="{{ asset('assets/css/components.css') }}">
+
+  <!-- Favicon and App Icon -->
+  <link rel="icon" type="image/png" href="{{ asset('assets/img/logo-icon.png') }}">
+  <link rel="apple-touch-icon" href="{{ asset('assets/img/logo-icon.png') }}">
+
+  <!-- Open Graph / Facebook Meta Tags -->
+  <meta property="og:title" content="Reset Password — ZedBallot">
+  <meta property="og:description" content="Set a new password for your ZedBallot account.">
+  <meta property="og:image" content="{{ asset('assets/img/logo-word.png') }}">
+  <meta property="og:url" content="{{ url()->current() }}">
+  <meta property="og:type" content="website">
+
+  <!-- WhatsApp Meta Tags (uses Open Graph) -->
+  <meta property="og:site_name" content="ZedBallot">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
 </head>
 <body>
   <div id="app">

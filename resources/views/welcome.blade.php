@@ -173,7 +173,7 @@
 
     <!-- Section Title -->
     <div class="container section-title" data-aos="fade-up">
-        <h2>    <img src="{{ asset('website-asset/assets/img/logo-word.png') }}" alt="ZedBallot Logo"></h2>
+        <h2>    <img src="{{ asset('website-asset/assets/img/logo-word.png') }}" alt="ZedBallot Logo" width="50%"></h2>
         <p>A trusted digital voting platform built for fairness, transparency, and scale</p>
     </div><!-- End Section Title -->
 
@@ -235,7 +235,7 @@
 
 
 <!-- Stats Section -->
-<section id="stats" class="stats section light-background">
+<section id="security" class="stats section light-background">
 
     <div class="container" data-aos="fade-up" data-aos-delay="100">
 
@@ -299,7 +299,7 @@
 
 
 <!-- Call To Action Section -->
-<section id="call-to-action" class="call-to-action section accent-background">
+<section id="contact" class="call-to-action section accent-background">
 
     <div class="container">
         <div class="row justify-content-center" data-aos="zoom-in" data-aos-delay="100">
@@ -334,7 +334,7 @@
 
 
 <!-- Faq Section -->
-<section id="faq" class="faq section light-background">
+<section id="how-it-works" class="faq section light-background">
 
     <!-- Section Title -->
     <div class="container section-title" data-aos="fade-up">
@@ -446,19 +446,13 @@
             <!-- Brand / About -->
             <div class="col-lg-5 col-md-12 footer-about">
                 <a href="{{ url('/') }}" class="logo d-flex align-items-center">
-                    <span class="sitename">ZedBallot</span>
+                            <h2>    <img src="{{ asset('website-asset/assets/img/logo-word.png') }}" alt="ZedBallot Logo" width="100%"></h2>
                 </a>
                 <p>
                     ZedBallot is a secure, transparent, and flexible online voting platform
                     designed for elections, awards, surveys, and decision-making at any scale.
                 </p>
 
-                <div class="social-links d-flex mt-4">
-                    <a href="#" aria-label="Twitter"><i class="bi bi-twitter-x"></i></a>
-                    <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
-                    <a href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
-                    <a href="#" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
-                </div>
             </div>
 
             <!-- Useful Links -->

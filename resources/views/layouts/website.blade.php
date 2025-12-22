@@ -25,6 +25,22 @@
     <link rel="stylesheet" href="{{ asset('website-assets/css/owl.theme.default.min.css') }}">
     <link rel="stylesheet" href="{{ asset('website-assets/css/templatemo-pod-talk.css') }}">
 
+    <!-- Favicon and App Icon -->
+  <link rel="icon" type="image/png" href="{{ asset('assets/img/logo-icon.png') }}">
+  <link rel="apple-touch-icon" href="{{ asset('assets/img/logo-icon.png') }}">
+
+  <!-- Open Graph / Facebook Meta Tags -->
+  <meta property="og:title" content="ZedBallot - Official Website">
+  <meta property="og:description" content="ZedBallot - Your trusted platform for secure and transparent voting.">
+  <meta property="og:image" content="{{ asset('assets/img/logo-word.png') }}">
+  <meta property="og:url" content="{{ url()->current() }}">
+  <meta property="og:type" content="website">
+
+  <!-- WhatsApp Meta Tags (uses Open Graph) -->
+  <meta property="og:site_name" content="ZedBallot">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
     <!--
 
 TemplateMo 584 Pod Talk
