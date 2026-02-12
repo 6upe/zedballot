@@ -154,4 +154,29 @@ class Poll extends Model
         }
         return $this->voter_registration_token;
     }
+
+    public function syncStatus(): void
+    {
+        // Never change draft polls automatically
+        if ($this->status === 'draft') {
+            return;
+        }
+
+        $now = now();
+
+        if ($this->start_at && $now->lt($this->start_at)) {
+            $newStatus = 'scheduled';
+        }
+        elseif ($this->end_at && $now->gt($this->end_at)) {
+            $newStatus = 'closed';
+        }
+        else {
+            $newStatus = 'active';
+        }
+
+        // Only update if changed (avoids unnecessary DB writes)
+        if ($this->status !== $newStatus) {
+            $this->update(['status' => $newStatus]);
+        }
+    }
 }

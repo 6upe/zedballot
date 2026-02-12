@@ -52,6 +52,32 @@
                                 Please check your email inbox (<strong>{{ $confirmation_email }}</strong>) and click the confirmation button to complete your vote. Your vote will only be counted after confirmation.
                             </div>
                         @endif
+
+                        @if(isset($email_confirmation) && $email_confirmation)
+                            <div class="mt-4">
+                                <span id="resend-info" class="text-muted">
+                                    You can reload this page to resend the confirmation email in <span id="countdown">60</span> seconds.
+                                </span>
+                                <button id="reload-btn" class="btn btn-link p-0 mt-2" style="display:none;" onclick="location.reload();">Reload Page to Resend Email</button>
+                            </div>
+                            <script>
+                                let seconds = 60;
+                                const countdownEl = document.getElementById('countdown');
+                                const reloadBtn = document.getElementById('reload-btn');
+                                const resendInfo = document.getElementById('resend-info');
+                                const timer = setInterval(() => {
+                                    seconds--;
+                                    countdownEl.textContent = seconds;
+                                    if (seconds <= 0) {
+                                        clearInterval(timer);
+                                        resendInfo.style.display = 'none';
+                                        reloadBtn.style.display = 'inline-block';
+                                    }
+                                }, 1000);
+                            </script>
+                        @endif
+
+
                         <a href="{{ route('polls.index') }}" class="btn btn-vote mt-4">
                             <i class="fas fa-arrow-left mr-2"></i>Back to Polls
                         </a>

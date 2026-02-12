@@ -147,8 +147,20 @@
                     <p class="mb-0">{{ $poll->description }}</p>
                 </div>
                 <div class="col-md-4 text-right">
-                    <span class="status-badge status-active">VOTING OPEN</span>
+                    <span class="status-badge status-active">{{ strtoupper($poll->computed_status) }}</span>
                 </div>
+
+                @if ($poll->computed_status === 'closed')
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'Voting Closed',
+                                text: 'This poll is now closed. Voting is no longer possible.',
+                            });
+                        });
+                    </script>
+                @endif
             </div>
         </div>
     </div>

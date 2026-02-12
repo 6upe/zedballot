@@ -22,8 +22,17 @@ class VotingController extends Controller
     }
     public function submitVote(Request $request, Poll $poll)
     {
+
+        $poll->syncStatus();
+        $poll->refresh(); // make sure we have updated value
+
+        if ($poll->status !== 'active') {
+            return view('polls.vote_closed', compact('poll'));
+        }
+
         // Determine required voter info fields based on poll's voting methods
         $methods = array_map('trim', explode(',', $poll->voting_methods));
+        // dd($methods);
         $rules = [];
         if (in_array('name', $methods) || $poll->is_public) {
             $rules['name'] = 'required|string|max:255';
@@ -60,6 +69,9 @@ class VotingController extends Controller
                 ->where('identifier_type', $identifierType)
                 ->where('identifier_value', $identifierValue)
                 ->first();
+
+            dd($eligibleVoter->email);
+            
             if ($eligibleVoter) {
                 // Update email if different
                 if ($eligibleVoter->email !== $request->input('email')) {
@@ -91,6 +103,9 @@ class VotingController extends Controller
                 ->where('identifier_type', $identifierType)
                 ->where('identifier_value', $identifierValue)
                 ->first();
+
+                // dd($eligibleVoter->email);
+            
             if (!$eligibleVoter) {
                 return back()->withErrors(['You are not an eligible voter for this poll.']);
             }
@@ -156,9 +171,15 @@ class VotingController extends Controller
                 ]
             );
 
+            // dd('Reached email section');
             // Send notification to eligible voter's registered email
             \Notification::route('mail', $eligibleVoter->email)
-                ->notify(new \App\Notifications\VoteConfirmationNotification($poll, $voter, $confirmationUrl));
+                ->notify(new \App\Notifications\VoteConfirmationNotification(
+                    $poll,
+                    $voter,
+                    $eligibleVoter,
+                    $confirmationUrl
+                ));
 
             session()->flash('email_confirmation_sent', true);
             return view('polls.vote_success', [
