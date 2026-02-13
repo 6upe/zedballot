@@ -6,22 +6,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Results: {{ $poll->name }}</title>
+
+    <!-- Open Graph Meta Tags for WhatsApp and Facebook -->
+    <meta property="og:title" content="{{ $poll->name }}">
+    <meta property="og:description" content="{{ $poll->description }}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    @if($poll->cover_image)
+    <meta property="og:image" content="{{ asset('storage/'.$poll->cover_image) }}">
+    @elseif($poll->banner_image)
+    <meta property="og:image" content="{{ asset('storage/'.$poll->banner_image) }}">
+    @else
+    <meta property="og:image" content="{{ asset('assets/images/bg.jpg') }}">
+    @endif
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="ZedBallot">
+    <meta name="twitter:card" content="summary_large_image">
+
     <link rel="stylesheet" href="{{ asset('assets/modules/bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/modules/fontawesome/css/all.min.css') }}">
     <style>
+        
         body {
             min-height: 100vh;
-            background: linear-gradient(-45deg, #0f3d0f, #ff9800, #d32f2f, #000 90%);
-            background-size: 400% 400%;
-            animation: gradientBG 18s ease infinite;
+            background: url({{ asset('assets/images/bg.jpg') }}) no-repeat center center fixed; background-size: 100% 100%;
+            /* animation: gradientBG 18s ease infinite; */
         }
+
         @keyframes gradientBG {
             0% {background-position: 0% 50%;}
             50% {background-position: 100% 50%;}
             100% {background-position: 0% 50%;}
         }
         .poll-header {
-            background: rgba(0,0,0,0.7);
+            background: linear-gradient(135deg, #1AA726 0%, #ff9800 100%);
             color: white;
             padding: 3rem 0;
             margin-bottom: 2rem;
@@ -48,7 +67,7 @@
             border-radius: 18px;
             padding: 1.5rem;
             margin-bottom: 2rem;
-            background: rgba(30,30,30,0.55);
+            background: white;
             box-shadow: 0 8px 32px 0 rgba(31,38,135,0.18);
             backdrop-filter: blur(8px);
         }
@@ -93,7 +112,7 @@
             margin-right: 60%;
         }
         .profile-card {
-            background: rgba(0, 0, 0, 0.18);
+            background: white;
             border-radius: 24px;
             box-shadow: 0 8px 32px 0 rgba(31,38,135,0.18);
             padding: 2.5rem 1.5rem 2rem 1.5rem;
@@ -119,7 +138,7 @@
         .profile-card h5 {
             margin-bottom: 0.5rem;
             font-weight: 700;
-            color: #fff;
+            color: #ff9800;
             text-shadow: 0 2px 8px rgba(0,0,0,0.18);
         }
         .profile-card .badge {
@@ -187,20 +206,20 @@
         .status-active { background: #28a745; color: white; }
         .poll-dates {
             background: #f8f9fa;
-            border-left: 4px solid #667eea;
+            border-left: 4px solid #1AA726;
             padding: 1rem;
             border-radius: 6px;
             margin-bottom: 2rem;
         }
         .winner-summary {
             background: #f0f2ff;
-            border-left: 4px solid #764ba2;
+            border-left: 4px solid #ff9800;
             border-radius: 8px;
             padding: 1.5rem;
             margin-bottom: 2rem;
         }
         .winner-badge {
-            background: #764ba2;
+            background: #ff9800;
             color: #fff;
             border-radius: 20px;
             padding: 0.4rem 1.2rem;
@@ -323,7 +342,7 @@
                                 @endphp
 
                                 @foreach($cards as $i => $nominee)
-                                    <div class="profile-card custom-carousel-card" data-index="{{ $i }}" style="min-width: 320px; max-width: 340px; margin: 0 1rem;">
+                                    <div class="profile-card custom-carousel-card my-5" data-index="{{ $i }}" style="min-width: 320px; max-width: 340px; margin: 0 1rem;">
                                         @if($nominee->photo)
                                             <img src="{{ asset('storage/'.$nominee->photo) }}" alt="{{ $nominee->name }}" class="profile-photo mb-2">
                                         @else
@@ -335,7 +354,7 @@
                                         @if($nominee->bio)
                                             <p class="text-muted small mb-1">{{ Str::limit($nominee->bio, 180) }}</p>
                                         @endif
-                                        @if($nominee->email)
+                                        <!-- @if($nominee->email)
                                             <p class="text-muted small mb-1"><i class="fas fa-envelope mr-1"></i>{{ $nominee->email }}</p>
                                         @endif
                                         @if($nominee->phone)
@@ -347,18 +366,18 @@
                                                     <i class="fas fa-external-link-alt mr-1"></i>Profile
                                                 </a>
                                             </p>
-                                        @endif
+                                        @endif -->
                                         <span class="badge badge-pill badge-success" style="font-size:1.1em;">{{ $nominee->vote_count }} votes</span>
-                                        <div class="progress mt-2">
+                                        <!-- <div class="progress mt-2">
                                             <div class="progress-bar bg-info" role="progressbar" style="width: {{ $maxVotes > 0 ? round(($nominee->vote_count/$maxVotes)*100) : 0 }}%" aria-valuenow="{{ $nominee->vote_count }}" aria-valuemin="0" aria-valuemax="{{ $maxVotes }}">
                                                 {{ $maxVotes > 0 ? round(($nominee->vote_count/$maxVotes)*100) : 0 }}%
                                             </div>
-                                        </div>
+                                        </div> -->
                                     </div>
                                 @endforeach
                             </div>
-                            <button class="btn btn-link custom-carousel-prev" style="position:absolute;left:0;top:50%;transform:translateY(-50%);z-index:10;font-size:2rem;color:#fff;"><i class="fas fa-chevron-left"></i></button>
-                            <button class="btn btn-link custom-carousel-next" style="position:absolute;right:0;top:50%;transform:translateY(-50%);z-index:10;font-size:2rem;color:#fff;"><i class="fas fa-chevron-right"></i></button>
+                            <button class="btn btn-link custom-carousel-prev" style="position:absolute;left:0;top:50%;transform:translateY(-50%);z-index:10;font-size:2rem;color:#fff;"><i class="fas fa-chevron-left text-warning"></i></button>
+                            <button class="btn btn-link custom-carousel-next" style="position:absolute;right:0;top:50%;transform:translateY(-50%);z-index:10;font-size:2rem;color:#fff;"><i class="fas fa-chevron-right text-warning"></i></button>
                         </div>
                     </div>
                 @else

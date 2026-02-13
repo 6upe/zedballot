@@ -5,22 +5,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vote: {{ $poll->name }}</title>
+
+
+    <!-- Open Graph Meta Tags for WhatsApp and Facebook -->
+    <meta property="og:title" content="{{ $poll->name }}">
+    <meta property="og:description" content="{{ $poll->description }}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    @if($poll->cover_image)
+    <meta property="og:image" content="{{ asset('storage/'.$poll->cover_image) }}">
+    @elseif($poll->banner_image)
+    <meta property="og:image" content="{{ asset('storage/'.$poll->banner_image) }}">
+    @else
+    <meta property="og:image" content="{{ asset('assets/images/bg.jpg') }}">
+    @endif
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="ZedBallot">
+    <meta name="twitter:card" content="summary_large_image">
+
     <link rel="stylesheet" href="{{ asset('assets/modules/bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/modules/fontawesome/css/all.min.css') }}">
     <style>
-                body {
-                    min-height: 100vh;
-                    background: linear-gradient(-45deg, #000, #43ea7f, #ff9800, #d32f2f, #000 90%);
-                    background-size: 400% 400%;
-                    animation: gradientBG 18s ease infinite;
-                }
-                @keyframes gradientBG {
-                    0% {background-position: 0% 50%;}
-                    50% {background-position: 100% 50%;}
-                    100% {background-position: 0% 50%;}
-                }
+        body {
+            min-height: 100vh;
+            background: white;
+            background-size: 400% 400%;
+            /* animation: gradientBG 5s ease infinite; */
+        }
+
         .poll-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #00A82A 0%, #ff9800 100%);
             color: white;
             padding: 3rem 0;
             margin-bottom: 2rem;
@@ -44,12 +59,12 @@
             border-radius: 18px;
             padding: 1.5rem;
             margin-bottom: 2rem;
-            background: rgba(30,30,30,0.55);
+            background: white;
             box-shadow: 0 8px 32px 0 rgba(31,38,135,0.18);
             backdrop-filter: blur(8px);
         }
         .profile-card {
-            background: rgba(0, 0, 0, 0.18);
+            background: white;
             border-radius: 24px;
             box-shadow: 0 8px 32px 0 rgba(31,38,135,0.18);
             padding: 2.5rem 1.5rem 2rem 1.5rem;
@@ -61,15 +76,24 @@
             cursor: pointer;
             transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
         }
+        
         .profile-card.selected {
             border-color: #ff9800;
             background: #fff;
             box-shadow: 0 0 0 4px #ff980088;
         }
+
+        .profile-card.selected h5 {
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            color: #ff9800;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.18);
+        }
+
         .profile-card h5 {
             margin-bottom: 0.5rem;
             font-weight: 700;
-            color: #fff;
+            color: #000;
             text-shadow: 0 2px 8px rgba(0,0,0,0.18);
         }
         .profile-photo {
@@ -93,22 +117,22 @@
         }
         .status-active { background: #28a745; color: white; }
         .btn-vote {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #00A82A 0%, #ff9800 100%);
             border: none;
             color: white;
             padding: 0.7rem 2rem;
             font-weight: 600;
             border-radius: 6px;
-            transition: transform 0.2s ease;
+            transition: transform 0.01s ease;
         }
         .btn-vote:hover {
             transform: translateY(-2px);
             color: white;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 4px 12px rgba(47, 202, 0, 0.4);
         }
         .poll-dates {
             background: #f8f9fa;
-            border-left: 4px solid #667eea;
+            border-left: 4px solid #00A82A;
             padding: 1rem;
             border-radius: 6px;
             margin-bottom: 2rem;
@@ -214,6 +238,72 @@
         @if($poll->categories && $poll->categories->count() > 0)
             <form id="votingForm" method="POST" action="{{ route('polls.vote.submit', $poll) }}">
                 @csrf
+                <hr>
+
+                @foreach($poll->categories as $category)
+                    <div class="category-card">
+                        <h5 class="mb-3">
+                            <i class="fas fa-folder mr-2"></i>{{ $category->name }}
+                        </h5>
+                        @if($category->description)
+                            <p class="text-muted mb-3">{{ $category->description }}</p>
+                        @endif
+
+                        @php
+                            $categoryNominees = $poll->nominees->where('category_id', $category->id);
+                            $maxVotes = $categoryNominees->max('vote_count');
+                            $repeatCount = 5;
+                            $cards = collect();
+                            for ($i = 0; $i < $repeatCount; $i++) {
+                                foreach ($categoryNominees as $nominee) {
+                                    $cards->push($nominee);
+                                }
+                            }
+                        @endphp
+
+                        @if($categoryNominees->count() > 0)
+                            <div class="nominee-carousel-container">
+                                <div class="custom-nominee-carousel" id="custom-carousel-{{ $category->id }}" style="overflow: hidden; position: relative; width: 100%;">
+                                    <div class="custom-carousel-track d-flex align-items-center justify-content-center" style="transition: transform 0.7s cubic-bezier(.4,2,.6,1); will-change: transform;">
+                                        @foreach($cards as $i => $nominee)
+                                            <div class="profile-card custom-carousel-card my-5" data-index="{{ $i }}" style="min-width: 320px; max-width: 340px; margin: 0 1rem; position: relative;">
+                                                <input type="radio" name="votes[{{ $category->id }}]" value="{{ $nominee->id }}" id="vote-{{ $category->id }}-{{ $nominee->id }}-{{ $i }}" class="visually-hidden" hidden>
+                                                @if($nominee->photo)
+                                                    <img src="{{ asset('storage/'.$nominee->photo) }}" alt="{{ $nominee->name }}" class="profile-photo mb-2">
+                                                @else
+                                                    <div class="profile-photo mb-2">
+                                                        <i class="fas fa-user" style="font-size: 48px; color: #999;"></i>
+                                                    </div>
+                                                @endif
+                                                <h5>{{ $nominee->name }}</h5>
+                                                @if($nominee->bio)
+                                                    <p class="text-muted small mb-1">{{ Str::limit($nominee->bio, 180) }}</p>
+                                                @endif
+                                                <!-- @if($nominee->email)
+                                                    <p class="text-muted small mb-1"><i class="fas fa-envelope mr-1"></i>{{ $nominee->email }}</p>
+                                                @endif
+                                                @if($nominee->phone)
+                                                    <p class="text-muted small mb-1"><i class="fas fa-phone mr-1"></i>{{ $nominee->phone }}</p>
+                                                @endif
+                                                @if($nominee->social_link)
+                                                    <p class="small mb-1">
+                                                        <a href="{{ $nominee->social_link }}" target="_blank" rel="noopener">
+                                                            <i class="fas fa-external-link-alt mr-1"></i>Profile
+                                                        </a>
+                                                    </p>
+                                                @endif -->
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    <button type="button" class="btn btn-link custom-carousel-prev" style="position:absolute;left:0;top:50%;transform:translateY(-50%);z-index:10;font-size:2rem;color:#fff;"><i class="fas fa-chevron-left text-warning"></i></button>
+                                    <button type="button" class="btn btn-link custom-carousel-next" style="position:absolute;right:0;top:50%;transform:translateY(-50%);z-index:10;font-size:2rem;color:#fff;"><i class="fas fa-chevron-right text-warning"></i></button>
+                                </div>
+                            </div>
+                        @else
+                            <p class="text-muted">No nominees in this category.</p>
+                        @endif
+                    </div>
+                @endforeach
 
                 <h4 class="mb-3">Voter Information</h4>
                 <input type="hidden" name="poll_id" value="{{ $poll->id }}">
@@ -269,73 +359,6 @@
                         </div>
                     </div>
                 @endif
-
-                <hr>
-
-                @foreach($poll->categories as $category)
-                    <div class="category-card">
-                        <h5 class="mb-3">
-                            <i class="fas fa-folder mr-2"></i>{{ $category->name }}
-                        </h5>
-                        @if($category->description)
-                            <p class="text-muted mb-3">{{ $category->description }}</p>
-                        @endif
-
-                        @php
-                            $categoryNominees = $poll->nominees->where('category_id', $category->id);
-                            $maxVotes = $categoryNominees->max('vote_count');
-                            $repeatCount = 5;
-                            $cards = collect();
-                            for ($i = 0; $i < $repeatCount; $i++) {
-                                foreach ($categoryNominees as $nominee) {
-                                    $cards->push($nominee);
-                                }
-                            }
-                        @endphp
-
-                        @if($categoryNominees->count() > 0)
-                            <div class="nominee-carousel-container">
-                                <div class="custom-nominee-carousel" id="custom-carousel-{{ $category->id }}" style="overflow: hidden; position: relative; width: 100%;">
-                                    <div class="custom-carousel-track d-flex align-items-center justify-content-center" style="transition: transform 0.7s cubic-bezier(.4,2,.6,1); will-change: transform;">
-                                        @foreach($cards as $i => $nominee)
-                                            <div class="profile-card custom-carousel-card" data-index="{{ $i }}" style="min-width: 320px; max-width: 340px; margin: 0 1rem; position: relative;">
-                                                <input type="radio" name="votes[{{ $category->id }}]" value="{{ $nominee->id }}" id="vote-{{ $category->id }}-{{ $nominee->id }}-{{ $i }}" class="visually-hidden">
-                                                @if($nominee->photo)
-                                                    <img src="{{ asset('storage/'.$nominee->photo) }}" alt="{{ $nominee->name }}" class="profile-photo mb-2">
-                                                @else
-                                                    <div class="profile-photo mb-2">
-                                                        <i class="fas fa-user" style="font-size: 48px; color: #999;"></i>
-                                                    </div>
-                                                @endif
-                                                <h5>{{ $nominee->name }}</h5>
-                                                @if($nominee->bio)
-                                                    <p class="text-muted small mb-1">{{ Str::limit($nominee->bio, 180) }}</p>
-                                                @endif
-                                                @if($nominee->email)
-                                                    <p class="text-muted small mb-1"><i class="fas fa-envelope mr-1"></i>{{ $nominee->email }}</p>
-                                                @endif
-                                                @if($nominee->phone)
-                                                    <p class="text-muted small mb-1"><i class="fas fa-phone mr-1"></i>{{ $nominee->phone }}</p>
-                                                @endif
-                                                @if($nominee->social_link)
-                                                    <p class="small mb-1">
-                                                        <a href="{{ $nominee->social_link }}" target="_blank" rel="noopener">
-                                                            <i class="fas fa-external-link-alt mr-1"></i>Profile
-                                                        </a>
-                                                    </p>
-                                                @endif
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                    <button type="button" class="btn btn-link custom-carousel-prev" style="position:absolute;left:0;top:50%;transform:translateY(-50%);z-index:10;font-size:2rem;color:#fff;"><i class="fas fa-chevron-left"></i></button>
-                                    <button type="button" class="btn btn-link custom-carousel-next" style="position:absolute;right:0;top:50%;transform:translateY(-50%);z-index:10;font-size:2rem;color:#fff;"><i class="fas fa-chevron-right"></i></button>
-                                </div>
-                            </div>
-                        @else
-                            <p class="text-muted">No nominees in this category.</p>
-                        @endif
-                    </div>
-                @endforeach
 
                 <div class="text-center mb-4">
                     <button type="submit" class="btn btn-vote btn-lg">
