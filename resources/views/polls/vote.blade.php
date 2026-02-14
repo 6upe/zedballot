@@ -21,11 +21,12 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
     @if($poll->cover_image)
-    <meta property="og:image" content="{{ asset('public/storage/'.$poll->cover_image) }}">
+    <meta property="og:image" content="{{ url(asset('public/storage/'.$poll->cover_image)) }}">>
+    <meta property="og:image:url" content="{{ url(asset('public/storage/'.$poll->cover_image)) }}">
     @elseif($poll->banner_image)
-    <meta property="og:image" content="{{ asset('public/storage/'.$poll->banner_image) }}">
+    <meta property="og:image" content="{{ url(asset('public/storage/'.$poll->banner_image)) }}">
     @else
-    <meta property="og:image" content="{{ asset('assets/images/bg.jpg') }}">
+    <meta property="og:image" content="{{ url(asset('assets/images/bg.jpg')) }}">
     @endif
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
