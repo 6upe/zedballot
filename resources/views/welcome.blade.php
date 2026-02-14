@@ -19,7 +19,7 @@
     <!-- Social Media Meta Tags -->
     <meta property="og:title" content="@yield('title', 'ZedBallot — Secure Online Voting & Polling Platform')" />
     <meta property="og:description" content="@yield('meta_description', 'ZedBallot is a secure, transparent, and easy-to-use online voting and polling platform designed for organizations, institutions, and public elections.')" />
-    <meta property="og:image" content="{{ asset('website-asset/assets/img/logo-icon.png') }}" />
+    <meta property="og:image" content="{{ asset('website-asset/assets/img/logo-word.png') }}" />
     <meta property="og:url" content="{{ url()->current() }}" />
     <meta property="og:type" content="website" />
 
@@ -29,8 +29,8 @@
     <meta name="twitter:image" content="{{ asset('website-asset/assets/img/logo-word.png') }}" />
 
     {{-- Favicons --}}
-    <link rel="icon" href="{{ asset('website-asset/assets/img/logo-word.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('assets/img/logo-word.png') }}">
+    <link rel="icon" href="{{ asset('website-asset/assets/img/logo-icon.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('assets/img/logo-icon.png') }}">
 
     {{-- Fonts --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
