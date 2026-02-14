@@ -21,7 +21,7 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
     @if($poll->cover_image)
-    <meta property="og:image" content="{{ url(asset('public/storage/'.$poll->cover_image)) }}">>
+    <meta property="og:image" content="{{ url(asset('public/storage/'.$poll->cover_image)) }}">
     <meta property="og:image:url" content="{{ url(asset('public/storage/'.$poll->cover_image)) }}">
     @elseif($poll->banner_image)
     <meta property="og:image" content="{{ url(asset('public/storage/'.$poll->banner_image)) }}">
