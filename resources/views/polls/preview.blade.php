@@ -67,18 +67,18 @@
 
     <div class="container">
         @if($poll->cover_image)
-            <img src="{{ asset('storage/'.$poll->cover_image) }}" alt="Cover" class="poll-cover">
+            <img src="{{ asset('public/storage/'.$poll->cover_image) }}" alt="Cover" class="poll-cover">
         @endif
 
         @if($poll->banner_image)
-            <img src="{{ asset('storage/'.$poll->banner_image) }}" alt="Banner" class="poll-banner">
+            <img src="{{ asset('public/storage/'.$poll->banner_image) }}" alt="Banner" class="poll-banner">
         @endif
 
         @if($poll->video)
             <div class="mb-4">
                 <h5>Intro Video</h5>
                 <video controls class="w-100" style="max-height: 400px; border-radius: 8px;">
-                    <source src="{{ asset('storage/'.$poll->video) }}" type="video/mp4">
+                    <source src="{{ asset('public/storage/'.$poll->video) }}" type="video/mp4">
                     Your browser does not support the video tag.
                 </video>
             </div>
@@ -126,7 +126,7 @@
                                 <div class="col-md-6">
                                     <div class="nominee-card">
                                         @if($nominee->photo)
-                                            <img src="{{ asset('storage/'.$nominee->photo) }}" alt="{{ $nominee->name }}" 
+                                            <img src="{{ asset('public/storage/'.$nominee->photo) }}" alt="{{ $nominee->name }}" 
                                                  class="img-fluid rounded mb-2" style="max-height: 100px;">
                                         @endif
                                         <h6 class="mb-1">{{ $nominee->name }}</h6>

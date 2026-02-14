@@ -959,7 +959,7 @@ function renderNominees(nominees) {
                     <div class="d-flex flex-wrap gap-3">
                         ${group.nominees.map(nom => {
                             const photoUrl = nom.photo
-                                ? (nom.photo.startsWith('http') ? nom.photo : `/storage/${nom.photo}`)
+                                ? (nom.photo.startsWith('http') ? nom.photo : `/public/storage/${nom.photo}`)
                                 : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(nom.name || 'Nominee') + '&background=007bff&color=fff&size=128';
                             return `
                             <div class="nominee-item profile-card mx-2" data-id="${nom.id}">

@@ -21,9 +21,9 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
     @if($poll->cover_image)
-    <meta property="og:image" content="{{ asset('storage/'.$poll->cover_image) }}">
+    <meta property="og:image" content="{{ asset('public/storage/'.$poll->cover_image) }}">
     @elseif($poll->banner_image)
-    <meta property="og:image" content="{{ asset('storage/'.$poll->banner_image) }}">
+    <meta property="og:image" content="{{ asset('public/storage/'.$poll->banner_image) }}">
     @else
     <meta property="og:image" content="{{ asset('assets/images/bg.jpg') }}">
     @endif
@@ -199,18 +199,18 @@
 
     <div class="container">
         @if($poll->cover_image)
-            <img src="{{ asset('storage/'.$poll->cover_image) }}" alt="Cover" class="poll-cover">
+            <img src="{{ asset('public/storage/'.$poll->cover_image) }}" alt="Cover" class="poll-cover">
         @endif
 
         @if($poll->banner_image)
-            <img src="{{ asset('storage/'.$poll->banner_image) }}" alt="Banner" class="poll-banner">
+            <img src="{{ asset('public/storage/'.$poll->banner_image) }}" alt="Banner" class="poll-banner">
         @endif
 
         @if($poll->video)
             <div class="mb-4">
                 <h5><i class="fas fa-video mr-2"></i>Intro Video</h5>
                 <video controls class="w-100" style="max-height: 400px; border-radius: 8px;">
-                    <source src="{{ asset('storage/'.$poll->video) }}" type="video/mp4">
+                    <source src="{{ asset('public/storage/'.$poll->video) }}" type="video/mp4">
                     Your browser does not support the video tag.
                 </video>
             </div>
@@ -277,7 +277,7 @@
                                             <div class="profile-card custom-carousel-card my-5" data-index="{{ $i }}" style="min-width: 320px; max-width: 340px; margin: 0 1rem; position: relative;">
                                                 <input type="radio" name="votes[{{ $category->id }}]" value="{{ $nominee->id }}" id="vote-{{ $category->id }}-{{ $nominee->id }}-{{ $i }}" class="visually-hidden" hidden>
                                                 @if($nominee->photo)
-                                                    <img src="{{ asset('storage/'.$nominee->photo) }}" alt="{{ $nominee->name }}" class="profile-photo mb-2">
+                                                    <img src="{{ asset('public/storage/'.$nominee->photo) }}" alt="{{ $nominee->name }}" class="profile-photo mb-2">
                                                 @else
                                                     <div class="profile-photo mb-2">
                                                         <i class="fas fa-user" style="font-size: 48px; color: #999;"></i>

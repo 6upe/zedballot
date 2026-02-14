@@ -44,7 +44,7 @@
               default => 'badge-secondary',
             };
             $coverUrl = $poll->cover_image
-              ? asset('storage/'.$poll->cover_image)
+              ? asset('public/storage/'.$poll->cover_image)
               : asset('assets/img/news/img01.jpg');
           @endphp
           <div class="col-12 col-md-6 col-lg-4 mb-4">

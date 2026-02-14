@@ -21,9 +21,9 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
     @if($poll->cover_image)
-    <meta property="og:image" content="{{ asset('storage/'.$poll->cover_image) }}">
+    <meta property="og:image" content="{{ asset('public/storage/'.$poll->cover_image) }}">
     @elseif($poll->banner_image)
-    <meta property="og:image" content="{{ asset('storage/'.$poll->banner_image) }}">
+    <meta property="og:image" content="{{ asset('public/storage/'.$poll->banner_image) }}">
     @else
     <meta property="og:image" content="{{ asset('assets/images/bg.jpg') }}">
     @endif
@@ -266,11 +266,11 @@
 
     <div class="container">
         @if($poll->cover_image)
-            <img src="{{ asset('storage/'.$poll->cover_image) }}" alt="Cover" class="poll-cover">
+            <img src="{{ asset('public/storage/'.$poll->cover_image) }}" alt="Cover" class="poll-cover">
         @endif
 
         @if($poll->banner_image)
-            <img src="{{ asset('storage/'.$poll->banner_image) }}" alt="Banner" class="poll-banner">
+            <img src="{{ asset('public/storage/'.$poll->banner_image) }}" alt="Banner" class="poll-banner">
         @endif
 
         <div class="poll-dates">
@@ -352,7 +352,7 @@
                                 @foreach($cards as $i => $nominee)
                                     <div class="profile-card custom-carousel-card my-5" data-index="{{ $i }}" style="min-width: 320px; max-width: 340px; margin: 0 1rem;">
                                         @if($nominee->photo)
-                                            <img src="{{ asset('storage/'.$nominee->photo) }}" alt="{{ $nominee->name }}" class="profile-photo mb-2">
+                                            <img src="{{ asset('public/storage/'.$nominee->photo) }}" alt="{{ $nominee->name }}" class="profile-photo mb-2">
                                         @else
                                             <div class="profile-photo mb-2" style="display:flex;align-items:center;justify-content:center;">
                                                 <i class="fas fa-user" style="font-size: 48px; color: #999;"></i>
