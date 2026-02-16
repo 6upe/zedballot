@@ -18,7 +18,7 @@
   <body>
     <div class="container">
       <div class="header">
-        <img src="assets/img/logo-word.png" alt="{{ config('app.name') }}" class="logo">
+        <img src="https://zedballot.online/assets/img/logo-word.png" alt="{{ config('app.name') }}" class="logo">
       </div>
       <div class="content">
         <h2>Password Reset Request</h2>
