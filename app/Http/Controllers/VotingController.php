@@ -70,7 +70,7 @@ class VotingController extends Controller
                 ->where('identifier_value', $identifierValue)
                 ->first();
 
-            dd($eligibleVoter->email);
+            // dd($eligibleVoter->email);
             
             if ($eligibleVoter) {
                 // Update email if different
