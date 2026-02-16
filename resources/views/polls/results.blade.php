@@ -304,7 +304,7 @@
                         $nominees = $category->nominees;
                         $winner = $nominees->sortByDesc('vote_count')->first();
                     @endphp
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-10 mb-3">
                         <strong>{{ $category->name }}:</strong>
                         @if($winner)
                             <span class="winner-badge">
