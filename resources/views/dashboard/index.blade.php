@@ -96,7 +96,7 @@
                     default => 'badge-secondary',
                     };
                     $coverUrl = $poll->cover_image
-                    ? asset('storage/'.$poll->cover_image)
+                    ? asset('public/storage/'.$poll->cover_image)
                     : asset('assets/img/news/img01.jpg');
                     @endphp
                     <div class="mb-4 mx-2">
