@@ -31,7 +31,7 @@ class VoteConfirmationNotification extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->subject('Confirm Your Vote for ' . $this->poll->title)
+            ->subject('Vote Confirmation ' . $this->poll->name)
             ->view('emails.vote_confirmation', [
                 'poll' => $this->poll,
                 'voter' => $this->voter,
