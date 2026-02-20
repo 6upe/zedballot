@@ -101,7 +101,7 @@
                     @endphp
                     <div class="mb-4 mx-2">
                         <div class="card shadow-sm poll-card h-100 border-0">
-                            <div class="card-img-top poll-card-cover" style="background-image: url('{{ $coverUrl }}');">
+                            <div class="card-img-top poll-card-cover" style="background-image: url('{{ $coverUrl }}'); max-height: 100vh;">
                                 <span class="badge {{ $statusClass }} poll-status-badge text-uppercase">
                                     {{ $poll->computed_status }}
                                 </span>

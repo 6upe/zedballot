@@ -15,14 +15,14 @@
         }
         .poll-cover {
             width: 100%;
-            max-height: 300px;
+            max-height: 100vh;
             object-fit: cover;
             border-radius: 8px;
             margin-bottom: 2rem;
         }
         .poll-banner {
             width: 100%;
-            max-height: 200px;
+            max-height: 100vh;
             object-fit: cover;
             border-radius: 8px;
             margin-bottom: 1rem;
