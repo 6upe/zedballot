@@ -1,4 +1,4 @@
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,7 +21,7 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
     @if($poll->cover_image)
-    <meta property="og:image" content="{{ url(asset('public/storage/'.$poll->cover_image)) }}">>
+    <meta property="og:image" content="{{ url(asset('public/storage/'.$poll->cover_image)) }}">
     <meta property="og:image:url" content="{{ url(asset('public/storage/'.$poll->cover_image)) }}">
     @elseif($poll->banner_image)
     <meta property="og:image" content="{{ url(asset('public/storage/'.$poll->banner_image)) }}">
@@ -35,6 +35,7 @@
 
     <link rel="stylesheet" href="{{ asset('assets/modules/bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/modules/fontawesome/css/all.min.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body {
             min-height: 100vh;
@@ -58,7 +59,7 @@
         }
         .poll-banner {
             width: 100%;
-            max-height: 200px;
+            max-height: 100vh;
             object-fit: cover;
             border-radius: 8px;
             margin-bottom: 1rem;
@@ -199,9 +200,9 @@
     </div>
 
     <div class="container">
-        @if($poll->cover_image)
+        <!-- @if($poll->cover_image)
             <img src="{{ asset('public/storage/'.$poll->cover_image) }}" alt="Cover" class="poll-cover">
-        @endif
+        @endif -->
 
         @if($poll->banner_image)
             <img src="{{ asset('public/storage/'.$poll->banner_image) }}" alt="Banner" class="poll-banner">
