@@ -266,9 +266,9 @@
     </div>
 
     <div class="container">
-        @if($poll->cover_image)
+        <!-- @if($poll->cover_image)
             <img src="{{ asset('public/storage/'.$poll->cover_image) }}" alt="Cover" class="poll-cover">
-        @endif
+        @endif -->
 
         @if($poll->banner_image)
             <img src="{{ asset('public/storage/'.$poll->banner_image) }}" alt="Banner" class="poll-banner">
